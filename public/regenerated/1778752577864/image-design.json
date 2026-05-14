@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T10テンプレで予習期間の3要素を経歴ステップ風に縦展開。動画学習・コミュニティ質問・グルコン開催を段階的に提示し、7日本番前の準備サポート体制を可視化する",
+      "text": {
+        "main": "第1段階は予習で土台を固める",
+        "sub": "購入日から始まる事前サポート期間",
+        "other": [
+          "講義動画とアクションマップを1日30分で自分のペース進行",
+          "コミュニティで質問し放題、つまずいたらすぐ聞ける環境",
+          "月水金21時グルコン2時間で本番のつまずきを事前解消"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "4. 7日でついていけるのか / 2枚目",
+    "template": "T10",
+    "illustration": "経歴ステップ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T09:56:17.864Z"
+  }
+}

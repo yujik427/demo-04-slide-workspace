@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T04経歴ステップ型レイアウト。左に講師の歩み（公務員→Claude Code習得→実績達成）を3ステップで時系列表示。右側に『現役実践者が教える』という結論を強調配置。Claude Code配色（オレンジ・ブラウン系）で経歴の重みと信頼性を演出。",
+      "text": {
+        "main": "現役で稼ぐ人間が教える",
+        "sub": "公務員からClaude Code実践者へ",
+        "other": [
+          "元公務員・月給12万円・プログラミング経験ゼロから出発",
+          "Claude Codeで100個以上のシステムを構築し使い倒した",
+          "4人体制で初月売上4,500万円を達成、今も現場で実践中"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "6. 他のAIスクールと何が違うのか / 2枚目",
+    "template": "T04",
+    "illustration": "経歴ステップ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T10:00:12.138Z"
+  }
+}

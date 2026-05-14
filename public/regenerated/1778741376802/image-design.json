@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "章の締めスライド。落差ストーリーテンプレで「自分にもできそう」から「自分は何を作るか決まる」への到達点の差を表現。経歴ステップのイラストで段階的変化を示し、視聴後の確定的な状態を強調するレイアウト。",
+      "text": {
+        "main": "聞き終えた時、決まっている",
+        "sub": "「できそう」ではなく「何を作るか」",
+        "other": [
+          "この1時間で、可能な理由を種明かし",
+          "未経験からの到達ルートを全公開",
+          "ゴールは『自分は何を作るか』の確定"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "1. 結論 / 4枚目",
+    "template": "落差ストーリー",
+    "illustration": "経歴ステップ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T06:49:36.802Z"
+  }
+}

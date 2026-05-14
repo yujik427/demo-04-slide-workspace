@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T10テンプレで結論を提示。中央に大きな数字グラフ風ビジュアルで『7日』を強調し、左右にメインメッセージとサブ補足を配置。Claude Code配色で技術的な印象を演出。",
+      "text": {
+        "main": "未経験から7日でAI完成",
+        "sub": "プログラミング知識ゼロから始める",
+        "other": [
+          "答えは画面に書いてある通り",
+          "AIシステムを1本、7日間で完成させる",
+          "実際に私が今やっている事実です"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "1. 結論 / 3枚目",
+    "template": "T10",
+    "illustration": "数字グラフ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T09:47:00.910Z"
+  }
+}

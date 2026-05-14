@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "未経験でも可能であることを示す根拠提示スライド。T12テンプレートに従い、左側に『経歴ステップ』イラストを配置し、右側に証拠1（1期生の実績）を見出しと本文で構成。配色はClaude Code。",
+      "text": {
+        "main": "未経験でも7日で完成",
+        "sub": "1期生が示した実証ステップ",
+        "other": [
+          "プログラミング未経験者が7日でシステム1本を完成",
+          "本人がSNSでも実績を発信",
+          "講義教材でWEBワークスペースを自作し運用"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "3. 未経験で本当にできるのか / 1枚目",
+    "template": "T12",
+    "illustration": "経歴ステップ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T10:35:02.696Z"
+  }
+}

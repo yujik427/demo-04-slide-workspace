@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T10テンプレで価格提示スライドを構成。中央に受講料198,000円(税抜)を大きく強調表示。サブで支払い方法の選択肢を示し、本文で銀行振込割引・分割払い月額・1日換算額を3行で列挙。経歴ステップのイラストで段階的な支払いオプションを視覚化。Claude Code配色で信頼感のあるトーン。",
+      "text": {
+        "main": "受講料 198,000円(税抜)",
+        "sub": "1日あたり約251円から",
+        "other": [
+          "支払い方法はカード・銀行振込・分割払いから選択可能",
+          "銀行振込で一括の場合は5,000円引き",
+          "分割払いなら月々約7,532円、1日あたり約251円"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "8. 価格 / 1枚目",
+    "template": "T10",
+    "illustration": "経歴ステップ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T10:31:16.848Z"
+  }
+}

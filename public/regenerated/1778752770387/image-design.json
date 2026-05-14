@@ -1,0 +1,28 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "受講申込から本番までの4ステップを縦方向のステップ図で視覚化。経歴ステップイラストを左側に配置し、右側に各ステップの概要を箇条書きで示す。Claude Code配色（オレンジ系アクセント）でステップ番号を強調。本スライドは流れの全体像を提示する1枚目として、詳細説明は次スライドに譲り、ステップ名のみ簡潔に列挙する構成。",
+      "text": {
+        "main": "申込から本番まで4ステップ",
+        "sub": "迷わず進める受講フロー",
+        "other": [
+          "STEP1 購入（カード・振込・分割対応）",
+          "STEP2 日程選択してオープンチャット参加",
+          "STEP3 講義動画でClaude Code導入",
+          "STEP4 予習グルコンで疑問を解消し本番へ"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "9. 受講の流れ / 1枚目",
+    "template": "T03",
+    "illustration": "経歴ステップ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T09:59:30.387Z"
+  }
+}

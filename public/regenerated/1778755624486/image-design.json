@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T02テンプレートで結論を提示。数字グラフイラストで成果の定量性を強調。3つの実績数字を本文で列挙し、信頼性を担保するレイアウト。",
+      "text": {
+        "main": "未経験から7日でAI1本",
+        "sub": "実証済みの成果がここにある",
+        "other": [
+          "弊社ではClaude Code製システム100個以上を毎日稼働",
+          "私個人の初月売上は4,500万円を達成",
+          "1期生はエクセル経験のみから7日で業務自動化を完成"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "1. 結論 / 3枚目",
+    "template": "T02",
+    "illustration": "数字グラフ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T10:47:04.486Z"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T07で締めのCTAスライド。中央に大きく決断を促すメッセージ、下部に申込導線とLINE相談の補足を配置。チーム構成イラストを背景的に薄く配置し、サポート体制が整っていることを視覚化。Claude Code配色で温かみと信頼感を演出",
+      "text": {
+        "main": "あとは、決めるだけ。",
+        "sub": "7日後、AIを動かせる自分へ",
+        "other": [
+          "申し込みは画面のボタンから今すぐ",
+          "迷ったらLINEで個別相談、私が直接対応",
+          "募集枠には限りがあります"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "10. CTA / 2枚目",
+    "template": "T07",
+    "illustration": "チーム構成",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T10:01:46.873Z"
+  }
+}

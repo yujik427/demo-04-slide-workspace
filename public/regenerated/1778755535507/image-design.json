@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T10テンプレートで未経験者でも可能な理由を3つの根拠で示す。チーム構成イラストを右側に配置し、Claude Code配色（オレンジ系アクセント）で「AIに業務を依頼する感覚」を強調。理由列挙型レイアウト。",
+      "text": {
+        "main": "話しかけるだけで動く",
+        "sub": "コード不要、AIに業務を依頼する感覚",
+        "other": [
+          "日本語で「こういうもの作って」と話しかけるだけ",
+          "コードを書かない、読まない、覚えない",
+          "未経験でも初日からアウトプットが出る"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "3. 未経験で本当にできるのか / 3枚目",
+    "template": "T10",
+    "illustration": "チーム構成",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T10:45:35.507Z"
+  }
+}

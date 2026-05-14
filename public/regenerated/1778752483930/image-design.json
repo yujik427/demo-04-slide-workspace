@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T06テンプレートで、月給12万円の公務員からClaude Codeで100個以上のシステム構築という変化を、数字グラフのイラストで対比的に示す。左に過去の数字、右に現在の数字を配置し、ビフォーアフターを視覚化する。",
+      "text": {
+        "main": "公務員から100超構築",
+        "sub": "月給12万円・プログラミング未経験から",
+        "other": [
+          "元は公務員で月給12万円、プログラミング経験ゼロからスタート",
+          "Claude Codeを始めて100個以上のシステムを構築",
+          "未経験でも到達可能であることを自ら証明"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "3. 未経験で本当にできるのか / 2枚目",
+    "template": "T06",
+    "illustration": "数字グラフ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T09:54:43.930Z"
+  }
+}

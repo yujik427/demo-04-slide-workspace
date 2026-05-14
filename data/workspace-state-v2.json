@@ -1,17 +1,290 @@
 {
-  "updatedAt": "2026-05-14T08:20:48.488Z",
+  "updatedAt": "2026-05-14T10:56:20.721Z",
   "state": {
     "sections": {
+      "1": {
+        "paragraphs": [
+          {
+            "paragraphId": "s1-p1-fc6wwh",
+            "textFingerprint": "9871dk",
+            "templateId": "T01",
+            "templateSource": "manual",
+            "illustrationId": "team",
+            "illustrationSource": "manual",
+            "slideHistory": [
+              {
+                "id": 1778751849099,
+                "createdAt": "2026/5/14 18:44:09",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s1-p1-fc6wwh",
+                  "sourceText": "こんばんは。アドネス株式会社、佐藤将司です。\n今日この1時間、本質のClaud  Code完全攻略セミナーとしてお時間いただきます。",
+                  "count": 63,
+                  "status": "done",
+                  "title": "こんばんは。アドネス株式会社、佐藤将司です。",
+                  "imagePath": "/regenerated/1778751849090/slide-1.png"
+                },
+                "templateId": "T12",
+                "templateLabel": "汎用 T12",
+                "illustrationId": "step",
+                "illustrationLabel": "経歴ステップ",
+                "colorTheme": "bootcamp"
+              },
+              {
+                "id": 1778751616766,
+                "createdAt": "2026/5/14 18:40:16",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s1-p1-fc6wwh",
+                  "sourceText": "こんばんは。アドネス株式会社、佐藤将司です。\n今日この1時間、本質のClaud  Code完全攻略セミナーとしてお時間いただきます。",
+                  "count": 63,
+                  "status": "done",
+                  "title": "こんばんは。アドネス株式会社、佐藤将司です。",
+                  "imagePath": "/regenerated/1778751616761/slide-1.png"
+                },
+                "templateId": "T12",
+                "templateLabel": "汎用 T12",
+                "illustrationId": "step",
+                "illustrationLabel": "経歴ステップ",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": null
+          },
+          {
+            "paragraphId": "s1-p4-mnqms4",
+            "textFingerprint": "gmofe5",
+            "templateId": "T04",
+            "templateSource": "manual",
+            "illustrationId": "team",
+            "illustrationSource": "recommended",
+            "slideHistory": [
+              {
+                "id": 1778751928016,
+                "createdAt": "2026/5/14 18:45:28",
+                "slide": {
+                  "num": 2,
+                  "paragraphId": "s1-p4-mnqms4",
+                  "sourceText": "最初に、皆さんに少しだけ聞かせてください。\n毎日PC開いて、終わるまでに、似たような作業を繰り返してませんか?\n資料を作る、メールを返す、リサーチする、SNSに投稿する。\n「これ、もっと効率よくできないのかな」って、1日に何回か頭をよぎる。違いますか?\nそして、心のどこかで、こうも思ってませんか?\n「副業を始めたい。でも本業で疲れて、結局何もしないまま1週間が終わる」。\n「AIを使いこなせるようになりたい。でも、何から始めればいいか分からない」。\n「このまま今の会社で、給料も上がらないまま、10年過ごすことになるんじゃないか」。\nこの3つの不安、今日この1時間で、全部にこちらから答えを出します。",
+                  "count": 293,
+                  "status": "done",
+                  "title": "最初に、皆さんに少しだけ聞かせてください。",
+                  "imagePath": "/regenerated/1778751928004/slide-1.png"
+                },
+                "templateId": "T04",
+                "templateLabel": "数字強調",
+                "illustrationId": "team",
+                "illustrationLabel": "チーム構成",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778751928004/slide-1.png"
+          },
+          {
+            "paragraphId": "s1-p5-mnqms4",
+            "textFingerprint": "nssrpb",
+            "templateId": "T17",
+            "templateSource": "manual",
+            "illustrationId": "team",
+            "illustrationSource": "manual",
+            "slideHistory": [
+              {
+                "id": 1778756083465,
+                "createdAt": "2026/5/14 19:54:43",
+                "slide": {
+                  "num": 3,
+                  "paragraphId": "s1-p5-mnqms4",
+                  "sourceText": "答えは、画面に書いてある通りです。\nプログラミング未経験から、7日でAIシステムが1本完成する。\n「いやいや、無理でしょ」って、たぶん今思いましたよね。\nでも、これは私が今、実際にやってることなんです。\nうちの会社では、Claude Codeで作ったシステムを100個以上、毎日動かしてます。\n私個人で、初月の売上が4,500万円。\nそして1期生で、エクセルしか触ったことがなかった方が、参加から7日後、自分の業務を自動化するシステムを1本仕上げて出てきました。\nこれからの1時間で、なぜそれが可能なのか、未経験のあなたがどうやってそこに到達するのか、全部種明かししていきます。",
+                  "count": 281,
+                  "status": "done",
+                  "title": "答えは、画面に書いてある通りです。",
+                  "imagePath": "/regenerated/1778756083435/slide-1.png"
+                },
+                "templateId": "T17",
+                "templateLabel": "汎用 T17",
+                "illustrationId": "team",
+                "illustrationLabel": "チーム構成",
+                "colorTheme": "bootcamp"
+              },
+              {
+                "id": 1778755841580,
+                "createdAt": "2026/5/14 19:50:41",
+                "slide": {
+                  "num": 4,
+                  "paragraphId": "s1-p5-mnqms4",
+                  "sourceText": "これからの1時間で、なぜそれが可能なのか、未経験のあなたがどうやってそこに到達するのか、全部種明かししていきます。\n最後まで聞き終わった時、「自分にもできそう」じゃなくて、「自分は何を作るか」まで決まってる状態になります。",
+                  "count": 110,
+                  "status": "done",
+                  "title": "うちの会社では、Claude Codeで作ったシステムを",
+                  "imagePath": "/regenerated/1778755841566/slide-1.png"
+                },
+                "templateId": "T17",
+                "templateLabel": "汎用 T17",
+                "illustrationId": "team",
+                "illustrationLabel": "チーム構成",
+                "colorTheme": "bootcamp"
+              },
+              {
+                "id": 1778755624502,
+                "createdAt": "2026/5/14 19:47:04",
+                "slide": {
+                  "num": 3,
+                  "paragraphId": "s1-p5-mnqms4",
+                  "sourceText": "答えは、画面に書いてある通りです。\nプログラミング未経験から、7日でAIシステムが1本完成する。\n「いやいや、無理でしょ」って、たぶん今思いましたよね。\nでも、これは私が今、実際にやってることなんです。\nうちの会社では、Claude Codeで作ったシステムを100個以上、毎日動かしてます。\n私個人で、初月の売上が4,500万円。\nそして1期生で、エクセルしか触ったことがなかった方が、参加から7日後、自分の業務を自動化するシステムを1本仕上げて出てきました。",
+                  "count": 224,
+                  "status": "done",
+                  "title": "答えは、画面に書いてある通りです。",
+                  "imagePath": "/regenerated/1778755624486/slide-1.png"
+                },
+                "templateId": "T02",
+                "templateLabel": "疑問提示",
+                "illustrationId": "graph",
+                "illustrationLabel": "数字グラフ",
+                "colorTheme": "bootcamp"
+              },
+              {
+                "id": 1778755394647,
+                "createdAt": "2026/5/14 19:43:14",
+                "slide": {
+                  "num": 3,
+                  "paragraphId": "s1-p5-mnqms4",
+                  "sourceText": "答えは、画面に書いてある通りです。\nプログラミング未経験から、7日でAIシステムが1本完成する。\n「いやいや、無理でしょ」って、たぶん今思いましたよね。\nでも、これは私が今、実際にやってることなんです。",
+                  "count": 98,
+                  "status": "done",
+                  "title": "答えは、画面に書いてある通りです。",
+                  "imagePath": "/regenerated/1778755394639/slide-1.png"
+                },
+                "templateId": "T02",
+                "templateLabel": "疑問提示",
+                "illustrationId": "graph",
+                "illustrationLabel": "数字グラフ",
+                "colorTheme": "bootcamp"
+              },
+              {
+                "id": 1778752173023,
+                "createdAt": "2026/5/14 18:49:33",
+                "slide": {
+                  "num": 5,
+                  "paragraphId": "s1-p5-mnqms4",
+                  "sourceText": "これからの1時間で、なぜそれが可能なのか、未経験のあなたがどうやってそこに到達するのか、全部種明かししていきます。\n最後まで聞き終わった時、「自分にもできそう」じゃなくて、「自分は何を作るか」まで決まってる状態になります。",
+                  "count": 110,
+                  "status": "done",
+                  "title": "これからの1時間で、なぜそれが可能なのか、未経験のあなた",
+                  "imagePath": "/regenerated/1778752173013/slide-1.png"
+                },
+                "templateId": "T10",
+                "templateLabel": "汎用 T10",
+                "illustrationId": "graph",
+                "illustrationLabel": "数字グラフ",
+                "colorTheme": "bootcamp"
+              },
+              {
+                "id": 1778752101392,
+                "createdAt": "2026/5/14 18:48:21",
+                "slide": {
+                  "num": 4,
+                  "paragraphId": "s1-p5-mnqms4",
+                  "sourceText": "うちの会社では、Claude Codeで作ったシステムを100個以上、毎日動かしてます。\n私個人で、初月の売上が4,500万円。\nそして1期生で、エクセルしか触ったことがなかった方が、参加から7日後、自分の業務を自動化するシステムを1本仕上げて出てきました。",
+                  "count": 126,
+                  "status": "done",
+                  "title": "うちの会社では、Claude Codeで作ったシステムを",
+                  "imagePath": "/regenerated/1778752101381/slide-1.png"
+                },
+                "templateId": "T10",
+                "templateLabel": "汎用 T10",
+                "illustrationId": "graph",
+                "illustrationLabel": "数字グラフ",
+                "colorTheme": "bootcamp"
+              },
+              {
+                "id": 1778752020919,
+                "createdAt": "2026/5/14 18:47:00",
+                "slide": {
+                  "num": 3,
+                  "paragraphId": "s1-p5-mnqms4",
+                  "sourceText": "答えは、画面に書いてある通りです。\nプログラミング未経験から、7日でAIシステムが1本完成する。\n「いやいや、無理でしょ」って、たぶん今思いましたよね。\nでも、これは私が今、実際にやってることなんです。",
+                  "count": 98,
+                  "status": "done",
+                  "title": "答えは、画面に書いてある通りです。",
+                  "imagePath": "/regenerated/1778752020910/slide-1.png"
+                },
+                "templateId": "T10",
+                "templateLabel": "汎用 T10",
+                "illustrationId": "graph",
+                "illustrationLabel": "数字グラフ",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778756083435/slide-1.png"
+          }
+        ]
+      },
       "2": {
         "paragraphs": [
           {
             "paragraphId": "s2-p1-qswajc",
-            "textFingerprint": "9rh2iw",
-            "templateId": "T04",
-            "templateSource": "recommended",
-            "illustrationId": "graph",
-            "illustrationSource": "recommended",
-            "slideHistory": []
+            "textFingerprint": "qpbe66",
+            "templateId": "T10",
+            "templateSource": "manual",
+            "illustrationId": "team",
+            "illustrationSource": "manual",
+            "slideHistory": [
+              {
+                "id": 1778754938337,
+                "createdAt": "2026/5/14 19:35:38",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s2-p1-qswajc",
+                  "sourceText": "今、たぶん皆さんの頭の中、こうなってますよね。\n「未経験で本当にできるの?」\n「そもそも忙しい平日、時間取れないけど?」\n「198,000円、本当に元取れる?」\n「他のAIスクールと、何が違うの?」\nこの4つ、当たり前に出てくる疑問です。\nこういう時に「大丈夫です、信じてください」と言うのは、私は嫌いなんです。だからここからは、事実でお答えします。皆さんの疑問を、ひとつずつ潰していきます。",
+                  "count": 190,
+                  "status": "done",
+                  "title": "今、たぶん皆さんの頭の中、こうなってますよね。",
+                  "imagePath": "/regenerated/1778754938328/slide-1.png"
+                },
+                "templateId": "T10",
+                "templateLabel": "汎用 T10",
+                "illustrationId": "team",
+                "illustrationLabel": "チーム構成",
+                "colorTheme": "bootcamp"
+              },
+              {
+                "id": 1778752574969,
+                "createdAt": "2026/5/14 18:56:14",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s2-p1-qswajc",
+                  "sourceText": "今、たぶん皆さんの頭の中、こうなってますよね。\n「未経験で本当にできるの?」\n「そもそも忙しい平日、時間取れないけど?」\n「198,000円、本当に元取れる?」\n「他のAIスクールと、何が違うの?」\nこの4つ、当たり前に出てくる疑問です。\nこういう時に「大丈夫です、信じてください」と言うのは、私は嫌いなんです。だからここからは、事実でお答えします。皆さんの疑問を、ひとつずつ潰していきます。",
+                  "count": 190,
+                  "status": "done",
+                  "title": "今、たぶん皆さんの頭の中、こうなってますよね。",
+                  "imagePath": "/regenerated/1778752574964/slide-1.png"
+                },
+                "templateId": "T04",
+                "templateLabel": "数字強調",
+                "illustrationId": "step",
+                "illustrationLabel": "経歴ステップ",
+                "colorTheme": "bootcamp"
+              },
+              {
+                "id": 1778752355148,
+                "createdAt": "2026/5/14 18:52:35",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s2-p1-qswajc",
+                  "sourceText": "今、たぶん皆さんの頭の中、こうなってますよね。\n「未経験で本当にできるの?」\n「7日って短すぎない?」\n「198,000円、本当に元取れる?」\n「他のAIスクールと、何が違うの?」\n「そもそも忙しい平日、時間取れないけど?」\nこの5つ、当たり前に出てくる疑問です。\nこういう時に「大丈夫です、信じてください」と言うのは、私は嫌いなんです。だからここからは、事実でお答えします。皆さんの疑問を、ひとつずつ潰していきます。",
+                  "count": 202,
+                  "status": "done",
+                  "title": "今、たぶん皆さんの頭の中、こうなってますよね。",
+                  "imagePath": "/regenerated/1778752355142/slide-1.png"
+                },
+                "templateId": "T04",
+                "templateLabel": "数字強調",
+                "illustrationId": "graph",
+                "illustrationLabel": "数字グラフ",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778754938328/slide-1.png"
           }
         ]
       },
@@ -20,11 +293,67 @@
           {
             "paragraphId": "s3-p1-h59wmf",
             "textFingerprint": "h59wmf",
-            "templateId": "T03",
-            "templateSource": "recommended",
-            "illustrationId": "graph",
-            "illustrationSource": "recommended",
-            "slideHistory": []
+            "templateId": "T02",
+            "templateSource": "manual",
+            "illustrationId": "step",
+            "illustrationSource": "manual",
+            "slideHistory": [
+              {
+                "id": 1778755311962,
+                "createdAt": "2026/5/14 19:41:51",
+                "slide": {
+                  "num": 1,
+                  "sourceText": "1つ目。「未経験で本当にできるの?」。\nこれ、お答えできます。証拠を2つ出します。\n1つ目、1期生の存在です。\nプログラミングを一度もやったことがない方が、7日でシステムを1本完成させて出てきました。これは、ご本人がSNSでも発信してます。\n実際に講義でお渡ししたものを使って自分でWEBワークスペースを作って、Claude Codeを動かしながらそこでほぼ完全自動でスライド作成をしている人もいます。",
+                  "count": 196,
+                  "status": "done",
+                  "title": "1つ目。「未経験で本当にできるの?」。",
+                  "imagePath": "/regenerated/1778755311955/slide-1.png",
+                  "paragraphId": "s3-p1-h59wmf"
+                },
+                "templateId": "T02",
+                "templateLabel": "疑問提示",
+                "illustrationId": "step",
+                "illustrationLabel": "経歴ステップ",
+                "colorTheme": "bootcamp"
+              },
+              {
+                "id": 1778754902708,
+                "createdAt": "2026/5/14 19:35:02",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s3-p1-h59wmf",
+                  "sourceText": "1つ目。「未経験で本当にできるの?」。\nこれ、お答えできます。証拠を2つ出します。\n1つ目、1期生の存在です。\nプログラミングを一度もやったことがない方が、7日でシステムを1本完成させて出てきました。これは、ご本人がSNSでも発信してます。\n実際に講義でお渡ししたものを使って自分でWEBワークスペースを作って、Claude Codeを動かしながらそこでほぼ完全自動でスライド作成をしている人もいます。",
+                  "count": 196,
+                  "status": "done",
+                  "title": "1つ目。「未経験で本当にできるの?」。",
+                  "imagePath": "/regenerated/1778754902696/slide-1.png"
+                },
+                "templateId": "T12",
+                "templateLabel": "汎用 T12",
+                "illustrationId": "step",
+                "illustrationLabel": "経歴ステップ",
+                "colorTheme": "bootcamp"
+              },
+              {
+                "id": 1778752415218,
+                "createdAt": "2026/5/14 18:53:35",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s3-p1-h59wmf",
+                  "sourceText": "1つ目。「未経験で本当にできるの?」。\nこれ、お答えできます。証拠を2つ出します。\n1つ目、1期生の存在です。\nプログラミングを一度もやったことがない方が、7日でシステムを1本完成させて出てきました。これは、ご本人がSNSでも発信してます。\n実際に講義でお渡ししたものを使って自分でWEBワークスペースを作って、Claude Codeを動かしながらそこでほぼ完全自動でスライド作成をしている人もいます。",
+                  "count": 196,
+                  "status": "done",
+                  "title": "1つ目。「未経験で本当にできるの?」。",
+                  "imagePath": "/regenerated/1778752415208/slide-1.png"
+                },
+                "templateId": "T04",
+                "templateLabel": "数字強調",
+                "illustrationId": "graph",
+                "illustrationLabel": "数字グラフ",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778755311955/slide-1.png"
           },
           {
             "paragraphId": "s3-p2-gjoolx",
@@ -33,16 +362,598 @@
             "templateSource": "manual",
             "illustrationId": "graph",
             "illustrationSource": "recommended",
-            "slideHistory": []
+            "slideHistory": [
+              {
+                "id": 1778752483937,
+                "createdAt": "2026/5/14 18:54:43",
+                "slide": {
+                  "num": 2,
+                  "paragraphId": "s3-p2-gjoolx",
+                  "sourceText": "2つ目、私自身。\n何度も言いますが、私はもとは公務員で、月給12万円、プログラミングは一切やったことがありませんでした。\nそこからClaude Codeを始めて、今までに100個以上のシステムを構築してます。",
+                  "count": 101,
+                  "status": "done",
+                  "title": "2つ目、私自身。",
+                  "imagePath": "/regenerated/1778752483930/slide-1.png"
+                },
+                "templateId": "T06",
+                "templateLabel": "比較",
+                "illustrationId": "graph",
+                "illustrationLabel": "数字グラフ",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778744317403/slide-1.png"
           },
           {
             "paragraphId": "s3-p3-1s50lxf",
             "textFingerprint": "1s50lxf",
-            "templateId": "T01",
-            "templateSource": "recommended",
+            "templateId": "T10",
+            "templateSource": "manual",
+            "illustrationId": "team",
+            "illustrationSource": "manual",
+            "slideHistory": [
+              {
+                "id": 1778755535518,
+                "createdAt": "2026/5/14 19:45:35",
+                "slide": {
+                  "num": 3,
+                  "sourceText": "なぜそれが可能か。理由はシンプルです。\nClaude Codeは、日本語で「こういうもの作って」って話しかけるだけで動くからです。\nコードを書きません。読みません。覚える必要も、ありません。\n「AIに業務を依頼する」感覚です。これなら、未経験でも、初日からアウトプットが出ます。",
+                  "count": 135,
+                  "status": "done",
+                  "title": "なぜそれが可能か。理由はシンプルです。",
+                  "imagePath": "/regenerated/1778755535507/slide-1.png",
+                  "paragraphId": "s3-p3-1s50lxf"
+                },
+                "templateId": "T10",
+                "templateLabel": "汎用 T10",
+                "illustrationId": "team",
+                "illustrationLabel": "チーム構成",
+                "colorTheme": "bootcamp"
+              },
+              {
+                "id": 1778752554457,
+                "createdAt": "2026/5/14 18:55:54",
+                "slide": {
+                  "num": 3,
+                  "paragraphId": "s3-p3-1s50lxf",
+                  "sourceText": "なぜそれが可能か。理由はシンプルです。\nClaude Codeは、日本語で「こういうもの作って」って話しかけるだけで動くからです。\nコードを書きません。読みません。覚える必要も、ありません。\n「AIに業務を依頼する」感覚です。これなら、未経験でも、初日からアウトプットが出ます。",
+                  "count": 135,
+                  "status": "done",
+                  "title": "なぜそれが可能か。理由はシンプルです。",
+                  "imagePath": "/regenerated/1778752554449/slide-1.png"
+                },
+                "templateId": "T01",
+                "templateLabel": "ストーリー",
+                "illustrationId": "step",
+                "illustrationLabel": "経歴ステップ",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778755535507/slide-1.png"
+          }
+        ]
+      },
+      "4": {
+        "paragraphs": [
+          {
+            "paragraphId": "s4-p1-1qw10rz",
+            "textFingerprint": "7lkzpu",
+            "templateId": "T06",
+            "templateSource": "manual",
+            "illustrationId": "team",
+            "illustrationSource": "recommended",
+            "slideHistory": [
+              {
+                "id": 1778752501638,
+                "createdAt": "2026/5/14 18:55:01",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s4-p1-1qw10rz",
+                  "sourceText": "2つ目、「7日でついていけるの?」、「忙しくて時間ない」という疑問。\n実はこのブートキャンプ、「7日間だけ集中」ではないんです。",
+                  "count": 63,
+                  "status": "done",
+                  "title": "2つ目、「7日でついていけるの?」、「忙しくて時間ない」",
+                  "imagePath": "/regenerated/1778752501631/slide-1.png"
+                },
+                "templateId": "T06",
+                "templateLabel": "比較",
+                "illustrationId": "team",
+                "illustrationLabel": "チーム構成",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778752501631/slide-1.png"
+          },
+          {
+            "paragraphId": "s4-p2-6w1dei",
+            "textFingerprint": "6w1dei",
+            "templateId": "T10",
+            "templateSource": "manual",
             "illustrationId": "step",
             "illustrationSource": "recommended",
-            "slideHistory": []
+            "slideHistory": [
+              {
+                "id": 1778752577870,
+                "createdAt": "2026/5/14 18:56:17",
+                "slide": {
+                  "num": 2,
+                  "paragraphId": "s4-p2-6w1dei",
+                  "sourceText": "第1段階、予習期間。\n購入したその日から、講義動画と「アクションマップ」を、自分のペースで進められます。1日30分でOK。コミュニティで質問し放題なので、つまずいたら、すぐ聞けます。\n月・水・金のグループコンサル（グルコン）を開催します。仕事終わりに参加できる夜２１時に行います。\n各曜日2時間ずつ、ブートキャンプ本番でつまずきやすいポイントを事前にまるごと解消します。\nグルコン以外も進捗状況で急遽サポートグルコンを開催したりするので「当日まったく動かない」という事態にならないよう、徹底的にサポートしますので「7日でついていけるの?」「忙しくて時間ない」という方も安心して取り組めるようにしています。",
+                  "count": 298,
+                  "status": "done",
+                  "title": "第1段階、予習期間。",
+                  "imagePath": "/regenerated/1778752577864/slide-1.png"
+                },
+                "templateId": "T10",
+                "templateLabel": "汎用 T10",
+                "illustrationId": "step",
+                "illustrationLabel": "経歴ステップ",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778752577864/slide-1.png"
+          },
+          {
+            "paragraphId": "s4-p3-1fz0r2k",
+            "textFingerprint": "1fz0r2k",
+            "templateId": "T10",
+            "templateSource": "manual",
+            "illustrationId": "step",
+            "illustrationSource": "recommended",
+            "slideHistory": [
+              {
+                "id": 1778752642028,
+                "createdAt": "2026/5/14 18:57:22",
+                "slide": {
+                  "num": 3,
+                  "paragraphId": "s4-p3-1fz0r2k",
+                  "sourceText": "第2段階、ブートキャンプ本番。\n土曜日はブートキャンプ当日。11時から18時まで皆で集まって手を動かします。オフライン・オンラインどちらでも参加OK。\n私もリアルタイムで参加します。つまずいたら、その場で解消しつつ、Claud  Codeで１本AIで動かせるシステムを１本作成します。",
+                  "count": 138,
+                  "status": "done",
+                  "title": "第2段階、ブートキャンプ本番。",
+                  "imagePath": "/regenerated/1778752642021/slide-1.png"
+                },
+                "templateId": "T10",
+                "templateLabel": "汎用 T10",
+                "illustrationId": "step",
+                "illustrationLabel": "経歴ステップ",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778752642021/slide-1.png"
+          },
+          {
+            "paragraphId": "s4-p4-1k0snwp",
+            "textFingerprint": "1k0snwp",
+            "templateId": "T12",
+            "templateSource": "manual",
+            "illustrationId": "team",
+            "illustrationSource": "manual",
+            "slideHistory": [
+              {
+                "id": 1778754843114,
+                "createdAt": "2026/5/14 19:34:03",
+                "slide": {
+                  "num": 4,
+                  "paragraphId": "s4-p4-1k0snwp",
+                  "sourceText": "第3段階、補講期間。\n本番が終わった後、1ヶ月間補講としてを行います。作ったものへのフィードバックももちろん行います。\nつまり、「7日」だけを切り取ると短く見えますけど、実際には予習から補講まで、1ヶ月以上、伴走する構造です。\n夜2時間 × 3回と本番の7時間、これさえ確保できれば、未経験でも、ついていけます。",
+                  "count": 151,
+                  "status": "done",
+                  "title": "第3段階、補講期間。",
+                  "imagePath": "/regenerated/1778754843101/slide-1.png"
+                },
+                "templateId": "T12",
+                "templateLabel": "汎用 T12",
+                "illustrationId": "team",
+                "illustrationLabel": "チーム構成",
+                "colorTheme": "bootcamp"
+              },
+              {
+                "id": 1778752718387,
+                "createdAt": "2026/5/14 18:58:38",
+                "slide": {
+                  "num": 4,
+                  "paragraphId": "s4-p4-1k0snwp",
+                  "sourceText": "第3段階、補講期間。\n本番が終わった後、1ヶ月間補講としてを行います。作ったものへのフィードバックももちろん行います。\nつまり、「7日」だけを切り取ると短く見えますけど、実際には予習から補講まで、1ヶ月以上、伴走する構造です。\n夜2時間 × 3回と本番の7時間、これさえ確保できれば、未経験でも、ついていけます。",
+                  "count": 151,
+                  "status": "done",
+                  "title": "第3段階、補講期間。",
+                  "imagePath": "/regenerated/1778752718378/slide-1.png"
+                },
+                "templateId": "T10",
+                "templateLabel": "汎用 T10",
+                "illustrationId": "step",
+                "illustrationLabel": "経歴ステップ",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778754843101/slide-1.png"
+          }
+        ]
+      },
+      "5": {
+        "paragraphs": [
+          {
+            "paragraphId": "s5-p1-12c79z",
+            "textFingerprint": "12c79z",
+            "templateId": "T04",
+            "templateSource": "manual",
+            "illustrationId": "step",
+            "illustrationSource": "manual",
+            "slideHistory": [
+              {
+                "id": 1778752723153,
+                "createdAt": "2026/5/14 18:58:43",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s5-p1-12c79z",
+                  "sourceText": "3つ目。「198,000円、本当に元は取れるの?」。\nここ、たぶん一番気になるところですよね。\n結論から言います。月10万円の案件を、2件取れば、それで全額回収です。\n計算します。\n受講料が198,000円。Claude Codeの月額が約3,000円。\n月10万円の案件を2件取った時点で、20万円。受講料と、1ヶ月分の月額、もう超えてます。",
+                  "count": 166,
+                  "status": "done",
+                  "title": "3つ目。「198,000円、本当に元は取れるの?」。",
+                  "imagePath": "/regenerated/1778752723148/slide-1.png"
+                },
+                "templateId": "T04",
+                "templateLabel": "数字強調",
+                "illustrationId": "step",
+                "illustrationLabel": "経歴ステップ",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778752723148/slide-1.png"
+          },
+          {
+            "paragraphId": "s5-p2-1ge7kgo",
+            "textFingerprint": "1ge7kgo",
+            "templateId": "T05",
+            "templateSource": "manual",
+            "illustrationId": "graph",
+            "illustrationSource": "recommended",
+            "slideHistory": [
+              {
+                "id": 1778752804534,
+                "createdAt": "2026/5/14 19:00:04",
+                "slide": {
+                  "num": 2,
+                  "paragraphId": "s5-p2-1ge7kgo",
+                  "sourceText": "「でも、案件って簡単に取れるの?」って思いますよね。\nここで、1個データを見てください。\nClaude Codeを仕事で使いこなしてる日本人、推定で0.1%未満です。\n何が言いたいかというと、今、市場の供給が圧倒的に足りてない、ということです。\n案件は、今、明らかに足りてないんです。",
+                  "count": 137,
+                  "status": "done",
+                  "title": "「でも、案件って簡単に取れるの?」って思いますよね。",
+                  "imagePath": "/regenerated/1778752804528/slide-1.png"
+                },
+                "templateId": "T05",
+                "templateLabel": "手順説明",
+                "illustrationId": "graph",
+                "illustrationLabel": "数字グラフ",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778752804528/slide-1.png"
+          },
+          {
+            "paragraphId": "s5-p3-13a3u4e",
+            "textFingerprint": "13a3u4e",
+            "templateId": "T04",
+            "templateSource": "recommended",
+            "illustrationId": "graph",
+            "illustrationSource": "recommended",
+            "slideHistory": [
+              {
+                "id": 1778752907668,
+                "createdAt": "2026/5/14 19:01:47",
+                "slide": {
+                  "num": 3,
+                  "paragraphId": "s5-p3-13a3u4e",
+                  "sourceText": "私自身、Claude Codeで作った案件探索システムで、営業の初月に1,000万円の案件を1本取りました。\nこれ、特殊なケースじゃないんです。Claude Codeを使えるだけで、市場での値段が一段上がるから、起きるんです。",
+                  "count": 110,
+                  "status": "done",
+                  "title": "私自身、Claude Codeで作った案件探索システムで",
+                  "imagePath": "/regenerated/1778752907660/slide-1.png"
+                },
+                "templateId": "T04",
+                "templateLabel": "数字強調",
+                "illustrationId": "graph",
+                "illustrationLabel": "数字グラフ",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778752907660/slide-1.png"
+          }
+        ]
+      },
+      "6": {
+        "paragraphs": [
+          {
+            "paragraphId": "s6-p1-yrahvl",
+            "textFingerprint": "rfexvs",
+            "templateId": "T05",
+            "templateSource": "manual",
+            "illustrationId": "team",
+            "illustrationSource": "manual",
+            "slideHistory": [
+              {
+                "id": 1778755221549,
+                "createdAt": "2026/5/14 19:40:21",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s6-p1-yrahvl",
+                  "sourceText": "4つ目。「他のAIスクールと、何が違うの?」。\n正直に言います。今、世の中にAIスクールはたくさんあります。\nそして、教えてる人の多くは、「AIを教える人」であって、「AIで稼いでる人」ではないんです。\n私は違います。\n私はもとは公務員、月給12万円、プログラミング経験ゼロ。\nそこからClaude Codeを始めて、100個以上のシステムを構築して、Claude Codeを使い倒した結果、4人体制で初月売上4,500万円を達成しました。\nつまり、皆さんがこれから学ぶ内容を、私は今、毎日仕事で使って、結果を出し続けてます。\n「AIで稼ぐ方法」を、AIで現役で稼いでる人間が教える。\nこれが、他のAIスクールとの一番の違いです。\n机上の空論を聞きに来てるんじゃないんです。今、動いてる現場の話を、そのまま持って帰ってもらいます。",
+                  "count": 354,
+                  "status": "done",
+                  "title": "4つ目。「他のAIスクールと、何が違うの?」。",
+                  "imagePath": "/regenerated/1778755221542/slide-1.png"
+                },
+                "templateId": "T05",
+                "templateLabel": "手順説明",
+                "illustrationId": "team",
+                "illustrationLabel": "チーム構成",
+                "colorTheme": "bootcamp"
+              },
+              {
+                "id": 1778754734004,
+                "createdAt": "2026/5/14 19:32:14",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s6-p1-yrahvl",
+                  "sourceText": "4つ目。「他のAIスクールと、何が違うの?」。\n正直に言います。今、世の中にAIスクールはたくさんあります。\nそして、教えてる人の多くは、「AIを教える人」であって、「AIで稼いでる人」ではないんです。",
+                  "count": 99,
+                  "status": "done",
+                  "title": "4つ目。「他のAIスクールと、何が違うの?」。",
+                  "imagePath": "/regenerated/1778754733997/slide-1.png"
+                },
+                "templateId": "T10",
+                "templateLabel": "汎用 T10",
+                "illustrationId": "team",
+                "illustrationLabel": "チーム構成",
+                "colorTheme": "bootcamp"
+              },
+              {
+                "id": 1778752726387,
+                "createdAt": "2026/5/14 18:58:46",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s6-p1-yrahvl",
+                  "sourceText": "4つ目。「他のAIスクールと、何が違うの?」。\n正直に言います。今、世の中にAIスクールはたくさんあります。\nそして、教えてる人の多くは、「AIを教える人」であって、「AIで稼いでる人」ではないんです。",
+                  "count": 99,
+                  "status": "done",
+                  "title": "4つ目。「他のAIスクールと、何が違うの?」。",
+                  "imagePath": "/regenerated/1778752726381/slide-1.png"
+                },
+                "templateId": "T04",
+                "templateLabel": "数字強調",
+                "illustrationId": "team",
+                "illustrationLabel": "チーム構成",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778755221542/slide-1.png"
+          }
+        ]
+      },
+      "7": {
+        "paragraphs": [
+          {
+            "paragraphId": "s7-p1-wpmc0r",
+            "textFingerprint": "apvjdy",
+            "templateId": "T05",
+            "templateSource": "manual",
+            "illustrationId": "step",
+            "illustrationSource": "manual",
+            "slideHistory": [
+              {
+                "id": 1778754703403,
+                "createdAt": "2026/5/14 19:31:43",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s7-p1-wpmc0r",
+                  "sourceText": "ここまで、４つの疑問に答えてきました。\nここから、お渡しするものの中身をお話します。\nブートキャンプのグルコンと本番の全4回。これが本体です。\nただし、それだけじゃありません。\n2期生限定の特典として、アドネスが社内で実際に毎日使ってる12種のAIシステムを、そのままお渡しします。\n中身、少しだけ紹介します。\n・スライド自動生成、月額換算で40万円相当\n・PPTX自動作成、20万円相当\n・システム開発アシスタント、20万円相当\n・LP制作、SNS自動投稿、案件探索、SEO記事生成 …まだあります\n全部合わせて、1,736,000円相当です。\nこれ、動画を見て学んで終わり、じゃないんです。\n学んだ翌日から、実務で使える武器が、12個、手元に揃います。\nしかもお渡しできるAIシステムは毎週増やしています。\n開いて話しかけるだけで、動きます。",
+                  "count": 358,
+                  "status": "done",
+                  "title": "ここまで、４つの疑問に答えてきました。",
+                  "imagePath": "/regenerated/1778754703396/slide-1.png"
+                },
+                "templateId": "T08",
+                "templateLabel": "汎用 T08",
+                "illustrationId": "team",
+                "illustrationLabel": "チーム構成",
+                "colorTheme": "bootcamp"
+              },
+              {
+                "id": 1778752754736,
+                "createdAt": "2026/5/14 18:59:14",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s7-p1-wpmc0r",
+                  "sourceText": "ここまで、４つの疑問に答えてきました。\nここから、お渡しするものの中身をお話します。\nブートキャンプのグルコンと本番の全4回。これが本体です。\nただし、それだけじゃありません。\n2期生限定の特典として、アドネスが社内で実際に毎日使ってる12種のAIシステムを、そのままお渡しします。\n中身、少しだけ紹介します。\n・スライド自動生成、月額換算で40万円相当\n・PPTX自動作成、20万円相当\n・システム開発アシスタント、20万円相当\n・LP制作、SNS自動投稿、案件探索、SEO記事生成 …まだあります\n全部合わせて、1,736,000円相当です。\nこれ、動画を見て学んで終わり、じゃないんです。\n学んだ翌日から、実務で使える武器が、12個、手元に揃います。\nしかもお渡しできるAIシステムは毎週増やしています。\n開いて話しかけるだけで、動きます。",
+                  "count": 358,
+                  "status": "done",
+                  "title": "ここまで、４つの疑問に答えてきました。",
+                  "imagePath": "/regenerated/1778752754731/slide-1.png"
+                },
+                "templateId": "T08",
+                "templateLabel": "汎用 T08",
+                "illustrationId": "graph",
+                "illustrationLabel": "数字グラフ",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778754703396/slide-1.png"
+          },
+          {
+            "paragraphId": "s7-p2-qxmic2",
+            "textFingerprint": "qxmic2",
+            "templateId": "T04",
+            "templateSource": "recommended",
+            "illustrationId": "team",
+            "illustrationSource": "manual",
+            "slideHistory": [
+              {
+                "id": 1778755122646,
+                "createdAt": "2026/5/14 19:38:42",
+                "slide": {
+                  "num": 2,
+                  "paragraphId": "s7-p2-qxmic2",
+                  "sourceText": "・スライド自動生成、月額換算で40万円相当\n・PPTX自動作成、20万円相当\n・システム開発アシスタント、20万円相当\n・LP制作、SNS自動投稿、案件探索、SEO記事生成 …まだあります\n全部合わせて、1,736,000円相当です。\nこれ、動画を見て学んで終わり、じゃないんです。\n学んだ翌日から、実務で使える武器が、12個、手元に揃います。\nしかもお渡しできるAIシステムは毎週増やしています。\n開いて話しかけるだけで、動きます。",
+                  "count": 208,
+                  "status": "done",
+                  "title": "・スライド自動生成、月額換算で40万円相当",
+                  "imagePath": "/regenerated/1778755122640/slide-1.png"
+                },
+                "templateId": "T04",
+                "templateLabel": "数字強調",
+                "illustrationId": "team",
+                "illustrationLabel": "チーム構成",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778755122640/slide-1.png"
+          }
+        ]
+      },
+      "8": {
+        "paragraphs": [
+          {
+            "paragraphId": "s8-p1-ez1fsn",
+            "textFingerprint": "ez1fsn",
+            "templateId": "T10",
+            "templateSource": "manual",
+            "illustrationId": "step",
+            "illustrationSource": "manual",
+            "slideHistory": [
+              {
+                "id": 1778754676853,
+                "createdAt": "2026/5/14 19:31:16",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s8-p1-ez1fsn",
+                  "sourceText": "ここで、価格を、お伝えします。\n受講料は、198,000円(税抜)。\n支払い方法は、クレジットカード、銀行振込、分割払いから選べます。\n銀行振込で一括なら、5,000円引きです。\n分割なら、月々約7,532円。\nこれを1日あたりに直すと、約251円です。\nコンビニコーヒー1杯に菓子パン1個、それくらいの金額です。\nそして、さっき話したことを、もう一度思い出してください。\n月10万円の案件を1件取った瞬間、半年分の月額を、もう超えます。\nこのセミナーを最後まで聞いてくださってる時点で、皆さんは、自分の時間を投資して、動き始めてる方です。\nあとは、決めるかどうか、それだけです。",
+                  "count": 280,
+                  "status": "done",
+                  "title": "ここで、価格を、お伝えします。",
+                  "imagePath": "/regenerated/1778754676848/slide-1.png"
+                },
+                "templateId": "T10",
+                "templateLabel": "汎用 T10",
+                "illustrationId": "step",
+                "illustrationLabel": "経歴ステップ",
+                "colorTheme": "bootcamp"
+              },
+              {
+                "id": 1778752767692,
+                "createdAt": "2026/5/14 18:59:27",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s8-p1-ez1fsn",
+                  "sourceText": "ここで、価格を、お伝えします。\n受講料は、198,000円(税抜)。\n支払い方法は、クレジットカード、銀行振込、分割払いから選べます。\n銀行振込で一括なら、5,000円引きです。\n分割なら、月々約7,532円。\nこれを1日あたりに直すと、約251円です。\nコンビニコーヒー1杯に菓子パン1個、それくらいの金額です。\nそして、さっき話したことを、もう一度思い出してください。\n月10万円の案件を1件取った瞬間、半年分の月額を、もう超えます。\nこのセミナーを最後まで聞いてくださってる時点で、皆さんは、自分の時間を投資して、動き始めてる方です。\nあとは、決めるかどうか、それだけです。",
+                  "count": 280,
+                  "status": "done",
+                  "title": "ここで、価格を、お伝えします。",
+                  "imagePath": "/regenerated/1778752767686/slide-1.png"
+                },
+                "templateId": "T09",
+                "templateLabel": "汎用 T09",
+                "illustrationId": "graph",
+                "illustrationLabel": "数字グラフ",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778754676848/slide-1.png"
+          }
+        ]
+      },
+      "9": {
+        "paragraphs": [
+          {
+            "paragraphId": "s9-p1-14j5nqu",
+            "textFingerprint": "14j5nqu",
+            "templateId": "T03",
+            "templateSource": "manual",
+            "illustrationId": "step",
+            "illustrationSource": "recommended",
+            "slideHistory": [
+              {
+                "id": 1778752770392,
+                "createdAt": "2026/5/14 18:59:30",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s9-p1-14j5nqu",
+                  "sourceText": "「申し込んだあと、本番受講まで何をするの?」\nここを、ご説明します。\nステップ1、購入。\nクレジットカード、銀行振込、分割、どれでもOKです。\nステップ2、日にちを決めてオープンチャットに参加。\n購入後、本番当日の日にちを選んでもらって、該当するオープンチャットにご案内しますので参加するだけ。\nステップ3、Claud  Codeを導入\nオープンチャットから講義動画をお渡しするのでClaud  Codeの導入からはじめます。すでにClaud  Codeを導入している方でもすぐに別の動画の講義を受けることができます。\nステップ4、グルコンに参加で詰まっているところを質問する。\n本番までに開催する３日間の予習グルコンに参加してもらい、皆さんの詰まっているところを解消します。\nアーカイブも残しますので参加できなかった方も安心して取り組めます。\nグルコン以外の時間もオープンチャットで質問し放題。\nそして、土曜日に本番を迎えます。",
+                  "count": 397,
+                  "status": "done",
+                  "title": "「申し込んだあと、本番受講まで何をするの?」",
+                  "imagePath": "/regenerated/1778752770387/slide-1.png"
+                },
+                "templateId": "T03",
+                "templateLabel": "証拠提示",
+                "illustrationId": "step",
+                "illustrationLabel": "経歴ステップ",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778752770387/slide-1.png"
+          }
+        ]
+      },
+      "10": {
+        "paragraphs": [
+          {
+            "paragraphId": "s10-p1-yy84b3",
+            "textFingerprint": "yy84b3",
+            "templateId": "T02",
+            "templateSource": "manual",
+            "illustrationId": "step",
+            "illustrationSource": "recommended",
+            "slideHistory": [
+              {
+                "id": 1778752826538,
+                "createdAt": "2026/5/14 19:00:26",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s10-p1-yy84b3",
+                  "sourceText": "最後に、お伝えします。\n今、Claude Codeを仕事で使いこなしてる日本人は、0.1%未満。\nこれが意味するのは、今、参加するかしないかで、来年の自分が立ってる場所が、まったく違う景色になる、ということです。\nこのセミナーを最後まで聞いてくれてる時点で、皆さんはもう、その0.1%側に入る準備ができてる方です。",
+                  "count": 153,
+                  "status": "done",
+                  "title": "最後に、お伝えします。",
+                  "imagePath": "/regenerated/1778752826533/slide-1.png"
+                },
+                "templateId": "T02",
+                "templateLabel": "疑問提示",
+                "illustrationId": "step",
+                "illustrationLabel": "経歴ステップ",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778752826533/slide-1.png"
+          },
+          {
+            "paragraphId": "s10-p2-1jv1618",
+            "textFingerprint": "b5xkfu",
+            "templateId": "T07",
+            "templateSource": "recommended",
+            "illustrationId": "team",
+            "illustrationSource": "manual",
+            "slideHistory": [
+              {
+                "id": 1778752906881,
+                "createdAt": "2026/5/14 19:01:46",
+                "slide": {
+                  "num": 2,
+                  "paragraphId": "s10-p2-1jv1618",
+                  "sourceText": "あとは、決めるだけです。\n7日後、未経験のあなたが、自分の手で動かせるAIシステムを1本、持ってる状態に変わります。\nこれは、私が、確実にお約束します。\n申し込みは、画面に出てるボタンから。\n迷うところがあれば、LINEで個別相談もできます。私が直接お答えします。\n募集枠には、限りがあります。\n皆さんの参加、お待ちしてます。\n本日は、ありがとうございました。",
+                  "count": 173,
+                  "status": "done",
+                  "title": "あとは、決めるだけです。",
+                  "imagePath": "/regenerated/1778752906873/slide-1.png"
+                },
+                "templateId": "T07",
+                "templateLabel": "CTA",
+                "illustrationId": "team",
+                "illustrationLabel": "チーム構成",
+                "colorTheme": "bootcamp"
+              }
+            ],
+            "approvedImagePath": "/regenerated/1778752906873/slide-1.png"
           }
         ]
       }

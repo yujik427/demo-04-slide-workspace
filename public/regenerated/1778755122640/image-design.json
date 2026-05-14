@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T04テンプレ・チーム構成イラスト使用。12個のAIシステムが武器として手元に揃うことを訴求。価値の総額1,736,000円相当を強調し、毎週増えていく点も伝える",
+      "text": {
+        "main": "12個の武器が、即日手に入る",
+        "sub": "総額1,736,000円相当のAIシステム群",
+        "other": [
+          "スライド自動生成40万円、PPTX自動作成20万円、開発アシスタント20万円相当",
+          "LP制作・SNS投稿・案件探索・SEO記事生成…全12種が手元に揃う",
+          "お渡しするAIシステムは毎週増加、開いて話しかけるだけで動く"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "7. おまけじゃなく、武器が手に入る / 2枚目",
+    "template": "T04",
+    "illustration": "チーム構成",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T10:38:42.640Z"
+  }
+}

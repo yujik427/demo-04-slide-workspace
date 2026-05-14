@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T01テンプレート使用。Claude Codeが未経験者でも使える理由を提示するスライド。左側にメインメッセージ、右側に『経歴ステップ』イラストで日本語指示→AI実行→アウトプットの流れを表現。Claude Code配色（オレンジ系アクセント）で親しみやすさを演出。",
+      "text": {
+        "main": "日本語で話しかけるだけ",
+        "sub": "コードを書かない・読まない・覚えない",
+        "other": [
+          "Claude Codeは日本語で「こういうもの作って」で動く",
+          "AIに業務を依頼する感覚で使える",
+          "未経験でも初日からアウトプットが出る"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "3. 未経験で本当にできるのか / 3枚目",
+    "template": "T01",
+    "illustration": "経歴ステップ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T09:55:54.449Z"
+  }
+}

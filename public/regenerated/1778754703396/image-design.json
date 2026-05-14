@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "章の冒頭スライド。ブートキャンプ本体4回に加え、2期生限定で12種のAIシステムを特典として渡すことを伝える導入。T08レイアウトで結論を中央に大きく配置し、チーム構成イラストで「本体＋特典」の構造感を視覚化。Claude Code配色で締まりを出す。",
+      "text": {
+        "main": "武器が、12個ついてくる",
+        "sub": "本体4回 + 2期生限定の特典12種",
+        "other": [
+          "ブートキャンプ全4回が本体、それだけじゃない",
+          "アドネスが毎日使う12種のAIシステムを丸ごと進呈",
+          "総額1,736,000円相当、しかも毎週増えていく"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "7. おまけじゃなく、武器が手に入る / 1枚目",
+    "template": "T08",
+    "illustration": "チーム構成",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T10:31:43.396Z"
+  }
+}

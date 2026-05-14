@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "落差ストーリーで経歴ステップを表現。公務員12万円から起業・借金500万円までの転落を時系列で示す。左に経歴ステップのイラスト、右に数字を強調配置。Claude Code配色で重みのある演出。",
+      "text": {
+        "main": "月給12万円から借金500万円へ",
+        "sub": "公務員スタートから起業まで",
+        "other": [
+          "高卒で市役所入庁、月給は12万円だった",
+          "働きながら大学・大学院へ進学するも半年で中退",
+          "起業の道を選び、借金500万円を抱えるスタート"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "2. 私の話：公務員からのスタート / 1枚目",
+    "template": "落差ストーリー",
+    "illustration": "経歴ステップ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T05:06:52.472Z"
+  }
+}

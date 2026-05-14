@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T10テンプレート使用。Claude Code配色（オレンジ系）で3つの実績数字を数字グラフ風に視覚化。100個・4,500万円・7日の3指標を並列表示し、結論スライドとして説得力を持たせる。",
+      "text": {
+        "main": "数字が証明する実用性",
+        "sub": "会社・個人・受講者の三層実績",
+        "other": [
+          "社内で100個以上のシステムが毎日稼働中",
+          "個人の初月売上は4,500万円を記録",
+          "Excel経験者が参加7日後に自動化システム完成"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "1. 結論 / 4枚目",
+    "template": "T10",
+    "illustration": "数字グラフ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T09:48:21.381Z"
+  }
+}

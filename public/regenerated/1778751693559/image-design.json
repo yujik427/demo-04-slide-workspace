@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T04テンプレを使用し、3つの不安に答えを出すという結論を提示するスライド。チーム構成イラストで複数人の悩みを象徴的に表現。Claude Code配色でメインメッセージを強調。",
+      "text": {
+        "main": "3つの不安、今日全部答えます",
+        "sub": "本業・副業・AI・将来への悩みに決着",
+        "other": [
+          "副業を始めたいが本業で疲れ何もできない",
+          "AIを使いこなしたいが何から始めるか不明",
+          "今の会社で10年後も給料が上がらない不安"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "1. 結論 / 2枚目",
+    "template": "T04",
+    "illustration": "チーム構成",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T09:41:33.559Z"
+  }
+}

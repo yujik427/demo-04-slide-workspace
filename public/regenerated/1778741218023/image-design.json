@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "落差ストーリーのテンプレートで、プログラミング未経験という起点と7日でAIシステム1本完成という到達点の落差を視覚化。経歴ステップのイラストで段階的進展を表現。Claude Code配色（オレンジ系アクセント、ダーク背景）で結論の意外性を強調する2枚目スライド。",
+      "text": {
+        "main": "未経験から7日でAI完成",
+        "sub": "現在進行形で実証中の事実",
+        "other": [
+          "プログラミング未経験からのスタート",
+          "7日でAIシステムが1本完成する",
+          "これは今、実際にやっていること"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "1. 結論 / 2枚目",
+    "template": "落差ストーリー",
+    "illustration": "経歴ステップ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T06:46:58.023Z"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "落差ストーリーテンプレで経歴ステップのイラストを配置。経験ゼロから初月4,500万円達成までの飛躍を3段階で示す。Claude Code配色で数字を強調し、結果のインパクトを伝える。",
+      "text": {
+        "main": "経験ゼロから初月4,500万円",
+        "sub": "4人チームで突破した売上実績",
+        "other": [
+          "『案件探索ツール』で初月1,000万円の案件を獲得",
+          "法人AIコンサルを月額50〜200万円で複数社と契約",
+          "Claude Code活用で初月売上4,500万円を突破"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "2. 私の話：公務員からのスタート / 3枚目",
+    "template": "落差ストーリー",
+    "illustration": "経歴ステップ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T05:08:33.290Z"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "落差ストーリーの3枚目。経歴ステップのイラストで、会社実績→個人実績→受講生実績の3段階を視覚化。Claude Code配色で結論として実績を畳みかける構成。",
+      "text": {
+        "main": "実績が証明する再現性",
+        "sub": "会社・個人・受講生の3層で立証",
+        "other": [
+          "会社では100個以上のシステムが毎日稼働中",
+          "私個人の初月売上は4,500万円を記録",
+          "エクセル経験者が7日で自動化システム完成"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "1. 結論 / 3枚目",
+    "template": "落差ストーリー",
+    "illustration": "経歴ステップ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T06:48:08.483Z"
+  }
+}

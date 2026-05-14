@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T05テンプレートで市場供給不足を訴求。数字グラフのイラストで0.1%未満という希少性を視覚化。タイトルで結論を示し、サブで市場状況、本文で需給ギャップを説明する構成。",
+      "text": {
+        "main": "市場の供給が圧倒的に足りない",
+        "sub": "案件は今、明らかに足りていない",
+        "other": [
+          "Claude Codeを仕事で使いこなす日本人は推定0.1%未満",
+          "希少人材だからこそ案件が集中する状況",
+          "需要に対して供給が追いついていない市場環境"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "5. 元は取れるのか / 2枚目",
+    "template": "T05",
+    "illustration": "数字グラフ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T10:00:04.528Z"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "落差ストーリーの2枚目として、公務員からアドネス入社後の転換を経歴ステップで示す。プログラミング未経験からClaude Codeで100個以上のシステム構築という変化を強調。Claude Code配色でステップ図解を中央配置。",
+      "text": {
+        "main": "未経験から100個超を構築",
+        "sub": "アドネス入社で人生が一変",
+        "other": [
+          "プログラミング経験ゼロからのスタート",
+          "Claude Codeを使い始めて開発が可能に",
+          "100個以上のシステムを作れるように"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "2. 私の話：公務員からのスタート / 2枚目",
+    "template": "落差ストーリー",
+    "illustration": "経歴ステップ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T05:07:41.967Z"
+  }
+}

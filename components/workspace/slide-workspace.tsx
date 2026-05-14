@@ -206,6 +206,185 @@ function hashText(text: string) {
   return (hash >>> 0).toString(36);
 }
 
+// contenteditable は段落間を BR で表現するため、テキストノードと BR を
+// まとめて innerText 相当の1次元テキストにマップする。
+type EditorSegment =
+  | { kind: "text"; node: Text; start: number; end: number }
+  | { kind: "br"; node: HTMLBRElement; offset: number };
+
+function buildEditorLinearMap(editor: HTMLElement): {
+  text: string;
+  segments: EditorSegment[];
+} {
+  let text = "";
+  const segments: EditorSegment[] = [];
+  const walker = document.createTreeWalker(
+    editor,
+    NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT
+  );
+  let node: Node | null = walker.currentNode;
+  while (node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const textNode = node as Text;
+      const start = text.length;
+      text += textNode.data;
+      segments.push({ kind: "text", node: textNode, start, end: text.length });
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      const element = node as HTMLElement;
+      if (element.tagName === "BR") {
+        segments.push({ kind: "br", node: element as HTMLBRElement, offset: text.length });
+        text += "\n";
+      }
+    }
+    node = walker.nextNode();
+  }
+  return { text, segments };
+}
+
+function caretOffsetInLinearText(
+  editor: HTMLElement,
+  segments: EditorSegment[]
+): number | null {
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) return null;
+  const range = selection.getRangeAt(0);
+  if (!editor.contains(range.startContainer)) return null;
+
+  const container = range.startContainer;
+  const offsetIn = range.startOffset;
+
+  if (container.nodeType === Node.TEXT_NODE) {
+    for (const segment of segments) {
+      if (segment.kind === "text" && segment.node === container) {
+        return segment.start + Math.min(offsetIn, segment.node.length);
+      }
+    }
+    return null;
+  }
+
+  // anchor が要素 (editor 直下や BR の親) の場合: その要素の childNodes[offsetIn]
+  // より前にあるテキスト長を積み上げる
+  let consumed = 0;
+  const children = container.childNodes;
+  const limit = Math.min(offsetIn, children.length);
+  for (let i = 0; i < limit; i += 1) {
+    const child = children[i];
+    if (child.nodeType === Node.TEXT_NODE) {
+      consumed += (child as Text).length;
+    } else if ((child as HTMLElement).tagName === "BR") {
+      consumed += 1;
+    } else {
+      consumed += (child.textContent ?? "").length;
+    }
+  }
+  // container 自体が editor でない場合、container より前のセグメントを足す
+  if (container !== editor) {
+    for (const segment of segments) {
+      if (segment.kind === "text" && container.contains(segment.node)) {
+        consumed = Math.max(consumed, segment.end);
+        break;
+      }
+    }
+  }
+  return consumed;
+}
+
+function getCaretParagraphNum(editor: HTMLElement): number | null {
+  const { segments } = buildEditorLinearMap(editor);
+  const offset = caretOffsetInLinearText(editor, segments);
+  if (offset === null) return null;
+  const before = (() => {
+    let acc = "";
+    for (const segment of segments) {
+      if (segment.kind === "text") {
+        const remaining = offset - acc.length;
+        if (remaining <= 0) break;
+        acc += segment.node.data.slice(0, Math.min(segment.node.length, remaining));
+      } else {
+        if (acc.length >= offset) break;
+        acc += "\n";
+      }
+    }
+    return acc;
+  })();
+  return before.split(/\n[ \t]*\n/).length;
+}
+
+function focusParagraphAt(editor: HTMLElement, paragraphNum: number) {
+  const { text, segments } = buildEditorLinearMap(editor);
+
+  const targetNum = Math.max(1, paragraphNum);
+  let targetOffset = 0;
+  if (targetNum > 1) {
+    const separator = /\n[ \t]*\n/g;
+    let blockIdx = 1;
+    let match: RegExpExecArray | null;
+    while ((match = separator.exec(text)) !== null) {
+      blockIdx += 1;
+      if (blockIdx === targetNum) {
+        targetOffset = match.index + match[0].length;
+        break;
+      }
+    }
+    if (blockIdx < targetNum) {
+      targetOffset = text.length;
+    }
+  }
+
+  let chosenNode: Text | null = null;
+  let chosenOffset = 0;
+  for (const segment of segments) {
+    if (segment.kind === "text") {
+      if (targetOffset >= segment.start && targetOffset <= segment.end) {
+        chosenNode = segment.node;
+        chosenOffset = targetOffset - segment.start;
+        break;
+      }
+    }
+  }
+
+  if (!chosenNode) {
+    // targetOffset が BR の位置 → 直後の text segment へ寄せる
+    for (let i = 0; i < segments.length; i += 1) {
+      const segment = segments[i];
+      if (segment.kind === "br" && segment.offset >= targetOffset) {
+        const next = segments[i + 1];
+        if (next && next.kind === "text") {
+          chosenNode = next.node;
+          chosenOffset = 0;
+          break;
+        }
+      }
+    }
+  }
+
+  if (!chosenNode) {
+    // フォールバック: 末尾のテキストノード
+    for (let i = segments.length - 1; i >= 0; i -= 1) {
+      const segment = segments[i];
+      if (segment.kind === "text") {
+        chosenNode = segment.node;
+        chosenOffset = segment.node.length;
+        break;
+      }
+    }
+  }
+
+  if (!chosenNode) {
+    editor.focus();
+    return;
+  }
+
+  const range = document.createRange();
+  range.setStart(chosenNode, chosenOffset);
+  range.collapse(true);
+  const selection = window.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+  editor.focus();
+  chosenNode.parentElement?.scrollIntoView({ block: "center", behavior: "smooth" });
+}
+
 function createParagraphFingerprint(text: string) {
   return hashText(normalizeParagraphText(text));
 }
@@ -307,6 +486,9 @@ function reconcileParagraphSettings(
     if (fallbackIndex >= 0) {
       usedIndexes.add(fallbackIndex);
       const previous = previousSettings[fallbackIndex];
+      // テキスト一致(exactIndex)時のみ採用状態を引き継ぐ。同位置 fallback では原稿が
+      // 変わっているため、採用済みは外す。
+      const isExactMatch = exactIndex >= 0;
       return {
         ...previous,
         textFingerprint,
@@ -316,6 +498,7 @@ function reconcileParagraphSettings(
           previous.illustrationSource === "manual"
             ? previous.illustrationId
             : recommended.illustrationId,
+        approvedImagePath: isExactMatch ? previous.approvedImagePath ?? null : null,
       };
     }
 
@@ -327,8 +510,35 @@ function reconcileParagraphSettings(
       illustrationId: recommended.illustrationId,
       illustrationSource: "recommended",
       slideHistory: [],
+      approvedImagePath: null,
     };
   });
+}
+
+function computeSectionProgress(
+  scriptText: string,
+  paragraphSettings: ParagraphSlideSetting[] | undefined,
+  generatedSlides: GeneratedSlide[] | undefined
+): { approved: number; total: number } {
+  const blocks = parseScript(scriptText);
+  const total = blocks.length;
+  if (total === 0 || !paragraphSettings || !generatedSlides) {
+    return { approved: 0, total };
+  }
+
+  let approved = 0;
+  for (let i = 0; i < total; i += 1) {
+    const setting = paragraphSettings[i];
+    if (!setting || !setting.approvedImagePath) continue;
+    const matched = generatedSlides.find(
+      (slide) =>
+        slide.paragraphId === setting.paragraphId &&
+        slide.status === "done" &&
+        slide.imagePath === setting.approvedImagePath
+    );
+    if (matched) approved += 1;
+  }
+  return { approved, total };
 }
 
 // 配色テーマ
@@ -390,6 +600,7 @@ type ParagraphSlideSetting = {
   illustrationId: string;
   illustrationSource: SettingSource;
   slideHistory: SlideHistoryEntry[];
+  approvedImagePath: string | null;
 };
 
 type WorkspaceV2SectionState = {
@@ -458,6 +669,31 @@ export function SlideWorkspace() {
   const [paragraphMetrics, setParagraphMetrics] = useState<ParagraphMetric[]>([]);
 
   const currentSection = SALES_SECTIONS.find((s) => s.id === activeSection)!;
+  const sectionProgress = useMemo(() => {
+    return SALES_SECTIONS.reduce<Record<number, { approved: number; total: number }>>(
+      (acc, section) => {
+        const scriptText =
+          (editedScripts[section.id] ??
+            CHAPTER_DEFAULTS[section.id] ??
+            CHAPTER_DEFAULTS[2]) || "";
+        acc[section.id] = computeSectionProgress(
+          scriptText,
+          workspaceV2State.sections[section.id]?.paragraphs,
+          generatedSlidesBySection[section.id]
+        );
+        return acc;
+      },
+      {}
+    );
+  }, [editedScripts, workspaceV2State, generatedSlidesBySection]);
+  const sectionTotalApproved = Object.values(sectionProgress).reduce(
+    (sum, p) => sum + p.approved,
+    0
+  );
+  const sectionTotalSlides = Object.values(sectionProgress).reduce(
+    (sum, p) => sum + p.total,
+    0
+  );
   const savedScriptText =
     editedScripts[activeSection] ??
     CHAPTER_DEFAULTS[activeSection] ??
@@ -844,6 +1080,43 @@ export function SlideWorkspace() {
     }));
   }
 
+  // キャレット位置の段落 → 4区の選択中スライドへ追従
+  useEffect(() => {
+    function handleSelectionChange() {
+      if (isMockGenerating) return;
+      const editor = editorRef.current;
+      if (!editor) return;
+      const num = getCaretParagraphNum(editor);
+      if (num === null) return;
+      const clamped = Math.min(Math.max(1, num), Math.max(1, currentScript.length));
+      if ((selectedGeneratedSlidesBySection[activeSection] ?? 1) === clamped) return;
+      setSelectedGeneratedSlidesBySection((prev) => ({
+        ...prev,
+        [activeSection]: clamped,
+      }));
+    }
+
+    document.addEventListener("selectionchange", handleSelectionChange);
+    return () => document.removeEventListener("selectionchange", handleSelectionChange);
+  }, [
+    activeSection,
+    currentScript.length,
+    isMockGenerating,
+    selectedGeneratedSlidesBySection,
+  ]);
+
+  // 段落番号 → エディタ内の該当段落先頭にキャレットジャンプ＆スクロール
+  function jumpToParagraph(num: number) {
+    const editor = editorRef.current;
+    if (!editor) return;
+    setSelectedGeneratedSlideForSection(activeSection, num);
+    // contenteditable に未フォーカスのまま focus() するとレイアウト直後の DOM が
+    // 確定していない場合があるので、rAF で1回挟む
+    window.requestAnimationFrame(() => {
+      focusParagraphAt(editor, num);
+    });
+  }
+
   function updateParagraphSetting(
     paragraphId: string,
     updater: (setting: ParagraphSlideSetting) => ParagraphSlideSetting
@@ -887,6 +1160,43 @@ export function SlideWorkspace() {
       illustrationId,
       illustrationSource: "manual",
     }));
+  }
+
+  function toggleApprovedForSelected() {
+    const setting = selectedParagraphSetting;
+    if (!setting) return;
+    if (
+      !displaySelectedSlide ||
+      displaySelectedSlide.status !== "done" ||
+      !displaySelectedSlide.imagePath
+    ) {
+      return;
+    }
+    const slideKey = displaySelectedSlide.imagePath;
+    updateParagraphSetting(setting.paragraphId, (current) => ({
+      ...current,
+      approvedImagePath: current.approvedImagePath === slideKey ? null : slideKey,
+    }));
+  }
+
+  function clearApprovalForParagraph(sectionId: number, paragraphId: string | undefined) {
+    if (!paragraphId) return;
+    setWorkspaceV2State((prev) => {
+      const section = prev.sections[sectionId];
+      if (!section) return prev;
+      const paragraphs = section.paragraphs.map((setting) =>
+        setting.paragraphId === paragraphId && setting.approvedImagePath !== null
+          ? { ...setting, approvedImagePath: null }
+          : setting
+      );
+      return {
+        ...prev,
+        sections: {
+          ...prev.sections,
+          [sectionId]: { ...section, paragraphs },
+        },
+      };
+    });
   }
 
   function appendSlideHistoryEntry(
@@ -933,6 +1243,7 @@ export function SlideWorkspace() {
         : slide
     );
     setGeneratedSlidesBySection((prev) => ({ ...prev, [sectionId]: restoredSlides }));
+    clearApprovalForParagraph(sectionId, entry.slide.paragraphId);
 
     const baseState = workspaceStateRef.current ?? workspaceState;
     await persistWorkspaceStateNow({
@@ -1117,6 +1428,23 @@ export function SlideWorkspace() {
       [sectionId]: sourceScriptText,
     }));
     setSelectedGeneratedSlideForSection(sectionId, 1);
+    // 全段落再生成では各段落の採用フラグをまとめてクリア
+    setWorkspaceV2State((prev) => {
+      const section = prev.sections[sectionId];
+      if (!section) return prev;
+      const paragraphs = section.paragraphs.map((setting) =>
+        setting.approvedImagePath !== null
+          ? { ...setting, approvedImagePath: null }
+          : setting
+      );
+      return {
+        ...prev,
+        sections: {
+          ...prev.sections,
+          [sectionId]: { ...section, paragraphs },
+        },
+      };
+    });
 
     const nextSlides = createPendingSlides(scriptBlocks, currentParagraphSettings);
     let completedSlides = nextSlides;
@@ -1240,6 +1568,7 @@ export function SlideWorkspace() {
 
     setGeneratingSections((prev) => ({ ...prev, [sectionId]: true }));
     setSelectedGeneratedSlideForSection(sectionId, slideNum);
+    clearApprovalForParagraph(sectionId, targetSlide.paragraphId);
     const nextBaseSlides: GeneratedSlide[] = previewSlides.map((slide) =>
       slide.num === slideNum ? { ...slide, status: "generating", error: undefined } : slide
     );
@@ -1467,35 +1796,47 @@ export function SlideWorkspace() {
             <h2 className="text-[19px] leading-tight tracking-tight font-bold">
               {headerTitle}
             </h2>
-            <p className="mt-2 text-[12px] text-slate-500">全体 10/10枚</p>
+            <p className="mt-2 text-[12px] text-slate-500">
+              全体 {sectionTotalApproved}/{sectionTotalSlides}枚
+            </p>
           </header>
           <div className="px-3.5 py-3 overflow-auto flex-1">
             <div className="grid gap-1">
-              {SALES_SECTIONS.map((section) => (
-                <button
-                  key={section.id}
-                  type="button"
-                  onClick={() => setActiveSection(section.id)}
-                  className={`grid grid-cols-[1fr_auto] gap-3 items-start min-h-[42px] px-3 py-2.5 rounded-[10px] text-left text-[12px] transition-colors ${
-                    activeSection === section.id
-                      ? "bg-[#eef3f8] text-[#0f2f46] font-extrabold"
-                      : "text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  <span className="truncate leading-[1.7]">{section.title}</span>
-                  <span
-                    className={`text-[11px] leading-[1.7] whitespace-nowrap ${
-                      activeSection === section.id ? "text-[#0f2f46]" : "text-slate-400"
+              {SALES_SECTIONS.map((section) => {
+                const progress = sectionProgress[section.id] ?? { approved: 0, total: 0 };
+                const isComplete =
+                  progress.total > 0 && progress.approved >= progress.total;
+                const isActive = activeSection === section.id;
+                return (
+                  <button
+                    key={section.id}
+                    type="button"
+                    onClick={() => setActiveSection(section.id)}
+                    className={`grid grid-cols-[1fr_auto] gap-3 items-start min-h-[42px] px-3 py-2.5 rounded-[10px] text-left text-[12px] transition-colors ${
+                      isActive
+                        ? "bg-[#eef3f8] text-[#0f2f46] font-extrabold"
+                        : "text-slate-600 hover:bg-slate-50"
                     }`}
                   >
-                    {section.slideCount}
-                  </span>
-                </button>
-              ))}
+                    <span className="truncate leading-[1.7]">{section.title}</span>
+                    <span
+                      className={`text-[11px] leading-[1.7] whitespace-nowrap ${
+                        isComplete
+                          ? "text-emerald-600 font-bold"
+                          : isActive
+                            ? "text-[#0f2f46]"
+                            : "text-slate-400"
+                      }`}
+                    >
+                      {progress.approved}/{progress.total}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
           <footer className="mt-auto border-t border-slate-200/50 p-4 text-[12px] text-slate-500 leading-[1.8]">
-            進捗 10/10枚
+            進捗 {sectionTotalApproved}/{sectionTotalSlides}枚
             <br />
             想定時間 12/15分
           </footer>
@@ -1528,7 +1869,7 @@ export function SlideWorkspace() {
                 </span>
               </div>
               <div className="grid grid-cols-[44px_minmax(0,1fr)_44px] items-start gap-4">
-                <div className="pointer-events-none relative min-h-[520px] select-none">
+                <div className="relative min-h-[520px] select-none">
                   {currentScript.map((block, idx) => {
                     const metric = paragraphMetrics[idx];
                     const nextMetric = paragraphMetrics[idx + 1];
@@ -1541,18 +1882,22 @@ export function SlideWorkspace() {
                         top: `${metric?.top ?? 0}px`,
                       }}
                     >
-                      <span
-                        className={`relative z-10 inline-flex h-7 w-7 items-center justify-center rounded-full border text-[12px] font-black leading-none transition-colors ${
+                      <button
+                        type="button"
+                        onClick={() => jumpToParagraph(block.num)}
+                        disabled={isMockGenerating}
+                        aria-label={`段落${block.num}にカーソルを移動`}
+                        className={`relative z-10 inline-flex h-7 w-7 items-center justify-center rounded-full border text-[12px] font-black leading-none transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                           selectedGeneratedSlide === block.num
                             ? "border-[#0f5f7a] bg-[#0f5f7a] text-white"
-                            : "border-slate-300 bg-slate-50 text-slate-600"
+                            : "border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100"
                         }`}
                       >
                         {block.num}
-                      </span>
+                      </button>
                       {nextMetric && (
                         <span
-                          className="absolute left-1/2 top-[34px] w-px -translate-x-1/2 bg-slate-200"
+                          className="pointer-events-none absolute left-1/2 top-[34px] w-px -translate-x-1/2 bg-slate-200"
                           style={{ height: `${Math.max(18, nextMetric.top - (metric?.top ?? 0) - 38)}px` }}
                         />
                       )}
@@ -1792,8 +2137,8 @@ export function SlideWorkspace() {
                 {isMockGenerating
                   ? `${generatingSlide?.num ?? 1}/${currentScript.length}枚目を生成中...`
                   : isGeneratedStale
-                    ? `更新した原稿で${currentScript.length}枚再生成`
-                    : `この条件で${currentScript.length}枚生成`}
+                    ? `各条件で${currentScript.length}枚再生成`
+                    : `各条件で${currentScript.length}枚生成`}
               </button>
               <button
                 type="button"
@@ -1893,25 +2238,37 @@ export function SlideWorkspace() {
               </div>
               <div className="-mx-1 overflow-x-auto px-1 pb-2">
                 <div className="flex w-max gap-2">
-                {previewSlides.map((slide) => (
-                  <button
-                    key={slide.num}
-                    type="button"
-                    onClick={() => setSelectedGeneratedSlideForSection(activeSection, slide.num)}
-                    aria-label={`スライド${slide.num}を選択`}
-                    className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-[12px] font-black transition-colors ${
-                      selectedGeneratedSlide === slide.num
-                        ? slide.status === "failed"
-                          ? "border-red-600 bg-red-600 text-white"
-                          : "border-[#0f5f7a] bg-[#0f5f7a] text-white"
-                        : slide.status === "failed"
-                          ? "border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
-                          : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
-                    }`}
-                  >
-                    {slide.num}
-                  </button>
-                ))}
+                {previewSlides.map((slide) => {
+                  const setting = currentParagraphSettings[slide.num - 1];
+                  const isApproved =
+                    slide.status === "done" &&
+                    !!slide.imagePath &&
+                    setting?.approvedImagePath === slide.imagePath;
+                  const isSelected = selectedGeneratedSlide === slide.num;
+                  const isFailed = slide.status === "failed";
+                  const classes = isSelected
+                    ? isFailed
+                      ? "border-red-600 bg-red-600 text-white"
+                      : isApproved
+                        ? "border-emerald-600 bg-emerald-600 text-white"
+                        : "border-[#0f5f7a] bg-[#0f5f7a] text-white"
+                    : isFailed
+                      ? "border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
+                      : isApproved
+                        ? "border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                        : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100";
+                  return (
+                    <button
+                      key={slide.num}
+                      type="button"
+                      onClick={() => jumpToParagraph(slide.num)}
+                      aria-label={`スライド${slide.num}を選択${isApproved ? "（採用済み）" : ""}`}
+                      className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-[12px] font-black transition-colors ${classes}`}
+                    >
+                      {slide.num}
+                    </button>
+                  );
+                })}
                 </div>
               </div>
               {isGeneratedStale && displaySelectedSlide?.imagePath && (
@@ -1948,11 +2305,19 @@ export function SlideWorkspace() {
                     </button>
                   </div>
                 ) : displaySelectedSlide?.imagePath ? (
-                  <img
-                    src={displaySelectedSlide.imagePath}
-                    alt={`生成スライド ${displaySelectedSlide.num}`}
-                    className="h-full w-full object-cover"
-                  />
+                  <>
+                    <img
+                      src={displaySelectedSlide.imagePath}
+                      alt={`生成スライド ${displaySelectedSlide.num}`}
+                      className="h-full w-full object-cover"
+                    />
+                    {selectedParagraphSetting?.approvedImagePath ===
+                      displaySelectedSlide.imagePath && (
+                      <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-[10px] font-black text-white shadow-md">
+                        ✓ 採用済み
+                      </span>
+                    )}
+                  </>
                 ) : (
                   <div className="flex h-full flex-col justify-center p-[18px]">
                     <small className="text-[10px] font-black tracking-wider text-slate-400">
@@ -1967,8 +2332,35 @@ export function SlideWorkspace() {
                   </div>
                 )}
               </div>
+              {displaySelectedSlide?.status === "done" && displaySelectedSlide.imagePath ? (
+                (() => {
+                  const isApprovedSelected =
+                    selectedParagraphSetting?.approvedImagePath ===
+                    displaySelectedSlide.imagePath;
+                  return (
+                    <button
+                      type="button"
+                      onClick={toggleApprovedForSelected}
+                      disabled={isMockGenerating}
+                      className={`mt-3 w-full min-h-[40px] rounded-lg text-[13px] font-extrabold transition-colors disabled:opacity-50 ${
+                        isApprovedSelected
+                          ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                          : "border border-slate-300 bg-white text-slate-700 hover:border-emerald-500 hover:text-emerald-700"
+                      }`}
+                    >
+                      {isApprovedSelected ? "採用解除" : "これに決定"}
+                    </button>
+                  );
+                })()
+              ) : null}
               <p className="mt-3 text-[11px] text-slate-500 leading-[1.6]">
                 選択中: {displaySelectedSlide ? `${displaySelectedSlide.num}枚目` : "-"}
+                {selectedParagraphSetting?.approvedImagePath &&
+                displaySelectedSlide?.imagePath === selectedParagraphSetting.approvedImagePath
+                  ? "（採用済み）"
+                  : displaySelectedSlide?.status === "done"
+                    ? "（未採用）"
+                    : ""}
               </p>
             </div>
           </div>

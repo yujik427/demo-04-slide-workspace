@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T04テンプレで未経験者の実証成果を提示。左に数字グラフのイラスト、右に証拠を箇条書きで配置。1期生の具体的な成果を強調するレイアウト。180字以内。",
+      "text": {
+        "main": "未経験でも7日で完成",
+        "sub": "1期生が証明した実績",
+        "other": [
+          "プログラミング未経験者が7日でシステムを1本完成",
+          "ご本人がSNSでも発信中の確かな実績",
+          "Claude Codeでスライド作成を自動化する受講生も登場"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "3. 未経験で本当にできるのか / 1枚目",
+    "template": "T04",
+    "illustration": "数字グラフ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T07:37:26.862Z"
+  }
+}

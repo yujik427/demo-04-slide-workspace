@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T12テンプレ採用。経歴ステップ風レイアウトで登壇者紹介と本セミナーの位置づけを提示。中央にメインタイトル、左右または下部に登壇者名・セミナー概要を配置。Claude Code配色テーマで信頼感のあるトーンに。",
+      "text": {
+        "main": "本質のClaude Code完全攻略",
+        "sub": "1時間の完全攻略セミナー",
+        "other": [
+          "アドネス株式会社 佐藤将司",
+          "本日この1時間お時間いただきます",
+          "Claude Codeの本質を解説します"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "1. 結論 / 1枚目",
+    "template": "T12",
+    "illustration": "経歴ステップ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T09:40:16.761Z"
+  }
+}

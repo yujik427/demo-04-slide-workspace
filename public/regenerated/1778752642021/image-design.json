@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T10経歴ステップ型レイアウトで、ブートキャンプ本番（土曜日）の流れを時系列ステップで提示する。11時開始→手を動かす→18時完成までの3ステップ構成。Claude Code配色（オレンジ系アクセント）を使用し、ステップ番号と時刻を視覚的に強調する。",
+      "text": {
+        "main": "土曜本番、7時間で1本完成",
+        "sub": "第2段階：ブートキャンプ当日",
+        "other": [
+          "11時〜18時、皆で集まって手を動かす",
+          "オフライン・オンラインどちらでも参加OK",
+          "講師がリアルタイム参加、つまずきを即解消"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "4. 7日でついていけるのか / 3枚目",
+    "template": "T10",
+    "illustration": "経歴ステップ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T09:57:22.021Z"
+  }
+}

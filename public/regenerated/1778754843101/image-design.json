@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T12テンプレートでチーム構成イラストを活用し、本番後の1ヶ月補講期間と全体の伴走構造を示すスライド。Claude Code配色で、メインに結論、サブに補足、otherで時間配分の事実を端的に提示する。",
+      "text": {
+        "main": "本番後も1ヶ月、伴走します",
+        "sub": "第3段階：補講期間でフィードバック",
+        "other": [
+          "本番終了後、1ヶ月間の補講期間を設けます",
+          "作ったものへのフィードバックも実施します",
+          "予習・本番・補講で1ヶ月以上の伴走構造です"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "4. 7日でついていけるのか / 4枚目",
+    "template": "T12",
+    "illustration": "チーム構成",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T10:34:03.101Z"
+  }
+}

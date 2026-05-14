@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T04テンプレ、チーム構成イラストを右側に配置。配色はClaude Code。他のAIスクールとの差別化を提示する導入スライド。メインは結論型でキレ味重視。",
+      "text": {
+        "main": "教える人 ≠ 稼ぐ人",
+        "sub": "他のAIスクールとの決定的な違い",
+        "other": [
+          "世の中にAIスクールはたくさん存在する",
+          "多くは「AIを教える人」が講師を務める",
+          "「AIで稼いでいる人」ではないのが実情"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "6. 他のAIスクールと何が違うのか / 1枚目",
+    "template": "T04",
+    "illustration": "チーム構成",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T09:58:46.381Z"
+  }
+}

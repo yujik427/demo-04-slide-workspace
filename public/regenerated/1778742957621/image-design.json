@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "落差ストーリー型レイアウト。未経験という不安(Before)から、1期生が7日でシステム完成という事実(After)への落差を数字グラフで可視化。Claude Code配色（オレンジ基調）。中央に「7日」の大きな数字、下部に補足説明を配置",
+      "text": {
+        "main": "未経験から7日でシステム完成",
+        "sub": "1期生が証明した到達スピード",
+        "other": [
+          "プログラミング未経験の受講生が7日でシステムを1本完成",
+          "本人がSNSで発信し、成果を公開済み",
+          "Claude Codeで自作ワークスペース上のスライド作成も実現"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "3. 未経験で本当にできるのか / 1枚目",
+    "template": "落差ストーリー",
+    "illustration": "数字グラフ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T07:15:57.621Z"
+  }
+}

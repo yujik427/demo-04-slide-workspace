@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T04テンプレで経歴ステップ風に投資回収の計算過程を段階表示。冒頭に結論を大きく配置し、下部に内訳数字を3ステップで示すレイアウト。",
+      "text": {
+        "main": "月10万円の案件2件で全額回収",
+        "sub": "受講料198,000円は2案件で超える",
+        "other": [
+          "受講料198,000円＋Claude Code月額約3,000円",
+          "月10万円の案件2件で売上20万円",
+          "受講料と1ヶ月分の月額を上回り回収完了"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "5. 元は取れるのか / 1枚目",
+    "template": "T04",
+    "illustration": "経歴ステップ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T09:58:43.148Z"
+  }
+}

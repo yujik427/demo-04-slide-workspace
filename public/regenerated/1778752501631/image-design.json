@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T06テンプレートで疑問提起スライド。中央に大きな疑問符と本文を配置し、右側にチーム構成イラスト（複数人物が並ぶ）を配置。Claude Code配色（ベージュ・オレンジ系）で温かみのある印象。",
+      "text": {
+        "main": "7日でついていけるのか",
+        "sub": "よくある2つ目の疑問",
+        "other": [
+          "「忙しくて時間がない」という不安の声",
+          "実は「7日間だけ集中」ではありません",
+          "続きは次のスライドで解説します"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "4. 7日でついていけるのか / 1枚目",
+    "template": "T06",
+    "illustration": "チーム構成",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T09:55:01.631Z"
+  }
+}

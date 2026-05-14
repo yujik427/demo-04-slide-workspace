@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T04テンプレートで、受講検討者が抱く5つの典型的な疑問を提示するスライド。数字グラフのイラストを右側または背景に配置し、Claude Code配色（オレンジ・ダーク基調）で疑問の数を視覚化。タイトルは結論型、本文は5つの疑問を簡潔に列挙する構成。",
+      "text": {
+        "main": "その疑問、事実で答えます",
+        "sub": "未経験・期間・価格・差別化・時間",
+        "other": [
+          "未経験で本当にできるのか、7日は短すぎないか",
+          "198,000円で元が取れるのか、他校との違いは何か",
+          "忙しい平日に時間は取れるのか、5つの疑問を潰す"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "2. それ、本当？ / 1枚目",
+    "template": "T04",
+    "illustration": "数字グラフ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T09:52:35.142Z"
+  }
+}

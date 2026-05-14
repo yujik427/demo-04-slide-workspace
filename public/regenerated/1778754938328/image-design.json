@@ -1,0 +1,28 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T10テンプレートで、聴衆が抱く4つの疑問を提示するスライド。中央上部にメインタイトル、その下にサブタイトル、本文エリアに4つの疑問を箇条書き風に配置。チーム構成イラストを右側または下部に配置し、参加者の不安を視覚的に表現。Claude Code配色でクリーンに。",
+      "text": {
+        "main": "皆さんの疑問、4つ",
+        "sub": "事実でひとつずつお答えします",
+        "other": [
+          "未経験で本当にできるの？",
+          "忙しい平日、時間取れる？",
+          "198,000円、元取れる？",
+          "他のAIスクールと何が違う？"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "2. それ、本当？ / 1枚目",
+    "template": "T10",
+    "illustration": "チーム構成",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T10:35:38.328Z"
+  }
+}

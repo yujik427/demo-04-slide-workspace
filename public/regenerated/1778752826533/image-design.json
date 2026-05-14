@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "CTA導入スライド。T02テンプレで結論メッセージを中央に強く配置。経歴ステップのイラストで『今と来年』の分岐を視覚化。Claude Code配色で重要性を強調。0.1%という希少性を主役に。",
+      "text": {
+        "main": "今、決める。0.1%側へ。",
+        "sub": "参加する／しないで、来年の景色は変わる",
+        "other": [
+          "Claude Codeを仕事で使いこなす日本人は0.1%未満",
+          "最後まで聞いた皆さんは、もう準備ができている",
+          "今、参加するかしないかで、来年立つ場所が変わる"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "10. CTA / 1枚目",
+    "template": "T02",
+    "illustration": "経歴ステップ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T10:00:26.533Z"
+  }
+}

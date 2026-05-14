@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T04テンプレートで未経験でも可能な理由を提示。中央に『数字グラフ』イラストを配置し、AIへの依頼感覚で初日からアウトプットが出る点を強調する構成。3行の本文で根拠を簡潔に列挙する。",
+      "text": {
+        "main": "話しかけるだけで動く",
+        "sub": "コード記述・読解・暗記は一切不要",
+        "other": [
+          "日本語で「こういうもの作って」と依頼するだけ",
+          "AIに業務を依頼する感覚で操作できる",
+          "未経験でも初日からアウトプットが出る"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "3. 未経験で本当にできるのか / 3枚目",
+    "template": "T04",
+    "illustration": "数字グラフ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T07:39:47.617Z"
+  }
+}

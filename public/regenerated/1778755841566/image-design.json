@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T17テンプレ・チーム構成イラスト使用。1時間後の到達状態を結論型で提示するスライド。聞き終わった後の変化を明確に示し、本文で具体的な到達点を3行で展開する。",
+      "text": {
+        "main": "1時間後、答えが出る",
+        "sub": "聞き終えた時に変わる状態",
+        "other": [
+          "なぜ可能なのか、その種明かしを全公開",
+          "未経験からの到達ルートを完全解説",
+          "「何を作るか」まで決まった状態へ"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "1. 結論 / 4枚目",
+    "template": "T17",
+    "illustration": "チーム構成",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T10:50:41.566Z"
+  }
+}
