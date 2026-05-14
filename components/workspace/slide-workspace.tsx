@@ -515,6 +515,108 @@ function reconcileParagraphSettings(
   });
 }
 
+const DEFAULT_BOOTCAMP_SUBTHEME_ID = "sub-bootcamp-default";
+const DEFAULT_BOOTCAMP_SUBTHEME_NAME = "Claude Codeブートキャンプ販売スライド";
+
+function createEmptyNavigation(): NavigationState {
+  return {
+    themes: {
+      lecture: { subThemes: [] },
+      bootcamp: { subThemes: [] },
+    },
+  };
+}
+
+function buildDefaultNavigation(): NavigationState {
+  const nav = createEmptyNavigation();
+  nav.themes.bootcamp.subThemes = [
+    {
+      id: DEFAULT_BOOTCAMP_SUBTHEME_ID,
+      name: DEFAULT_BOOTCAMP_SUBTHEME_NAME,
+      chapters: SALES_SECTIONS.map((section) => ({
+        id: section.id,
+        title: section.title,
+      })),
+    },
+  ];
+  return nav;
+}
+
+function ensureNavigation(state: unknown): NavigationState {
+  if (
+    state &&
+    typeof state === "object" &&
+    "themes" in state &&
+    (state as NavigationState).themes &&
+    (state as NavigationState).themes.lecture &&
+    (state as NavigationState).themes.bootcamp
+  ) {
+    const candidate = state as NavigationState;
+    return {
+      themes: {
+        lecture: {
+          subThemes: Array.isArray(candidate.themes.lecture.subThemes)
+            ? candidate.themes.lecture.subThemes
+            : [],
+        },
+        bootcamp: {
+          subThemes: Array.isArray(candidate.themes.bootcamp.subThemes)
+            ? candidate.themes.bootcamp.subThemes
+            : [],
+        },
+      },
+    };
+  }
+  return buildDefaultNavigation();
+}
+
+function findChapterLocation(
+  navigation: NavigationState,
+  chapterId: number
+): { theme: ContentTheme; subThemeId: string } | null {
+  for (const themeKey of ["lecture", "bootcamp"] as const) {
+    for (const sub of navigation.themes[themeKey].subThemes) {
+      if (sub.chapters.some((chapter) => chapter.id === chapterId)) {
+        return { theme: themeKey, subThemeId: sub.id };
+      }
+    }
+  }
+  return null;
+}
+
+function countApprovedSlidesForChapter(
+  chapterId: number,
+  sections: Record<number, WorkspaceV2SectionState>
+): number {
+  const paragraphs = sections[chapterId]?.paragraphs ?? [];
+  return paragraphs.reduce(
+    (sum, paragraph) => (paragraph.approvedImagePath ? sum + 1 : sum),
+    0
+  );
+}
+
+function countApprovedSlidesForSubTheme(
+  subTheme: SubThemeEntry,
+  sections: Record<number, WorkspaceV2SectionState>
+): number {
+  return subTheme.chapters.reduce(
+    (sum, chapter) => sum + countApprovedSlidesForChapter(chapter.id, sections),
+    0
+  );
+}
+
+function computeNextChapterId(navigation: NavigationState): number {
+  let max = 0;
+  for (const themeKey of ["lecture", "bootcamp"] as const) {
+    for (const sub of navigation.themes[themeKey].subThemes) {
+      for (const chapter of sub.chapters) {
+        if (chapter.id > max) max = chapter.id;
+      }
+    }
+  }
+  return max + 1;
+}
+
 function computeSectionProgress(
   scriptText: string,
   paragraphSettings: ParagraphSlideSetting[] | undefined,
@@ -607,7 +709,23 @@ type WorkspaceV2SectionState = {
   paragraphs: ParagraphSlideSetting[];
 };
 
+type ChapterEntry = {
+  id: number;
+  title: string;
+};
+
+type SubThemeEntry = {
+  id: string;
+  name: string;
+  chapters: ChapterEntry[];
+};
+
+type NavigationState = {
+  themes: Record<ContentTheme, { subThemes: SubThemeEntry[] }>;
+};
+
 type WorkspaceV2State = {
+  navigation: NavigationState;
   sections: Record<number, WorkspaceV2SectionState>;
 };
 
@@ -653,39 +771,64 @@ export function SlideWorkspace() {
   const [generatingSections, setGeneratingSections] = useState<Record<number, boolean>>({});
   const [draftSaveStatus, setDraftSaveStatus] = useState<DraftSaveStatus>("loading");
   const [workspaceStateReady, setWorkspaceStateReady] = useState(false);
-  const [workspaceV2State, setWorkspaceV2State] = useState<WorkspaceV2State>({ sections: {} });
+  const [workspaceV2State, setWorkspaceV2State] = useState<WorkspaceV2State>(() => ({
+    navigation: createEmptyNavigation(),
+    sections: {},
+  }));
   const [workspaceV2Ready, setWorkspaceV2Ready] = useState(false);
   const [templateModalTargetSlide, setTemplateModalTargetSlide] = useState<number | null>(null);
+  const [activeSubThemeIdByTheme, setActiveSubThemeIdByTheme] = useState<
+    Record<ContentTheme, string | null>
+  >({ lecture: null, bootcamp: DEFAULT_BOOTCAMP_SUBTHEME_ID });
+  const [confirmState, setConfirmState] = useState<{
+    title: string;
+    message: string;
+    onConfirm: (() => void) | null;
+    confirmLabel?: string;
+  } | null>(null);
+  const [renamingChapterId, setRenamingChapterId] = useState<number | null>(null);
+  const [renamingSubThemeId, setRenamingSubThemeId] = useState<string | null>(null);
   // 章ごとに編集中の原稿テキストを保持（state、リロードで消える）
   const [editedScripts, setEditedScripts] = useState<Record<number, string>>({});
   const hasLoadedDraftRef = useRef(false);
   const hasLoadedWorkspaceStateRef = useRef(false);
   const isRestoringWorkspaceStateRef = useRef(true);
   const workspaceStateRef = useRef<WorkspacePersistedState | null>(null);
-  const workspaceV2StateRef = useRef<WorkspaceV2State>({ sections: {} });
+  const workspaceV2StateRef = useRef<WorkspaceV2State>({
+    navigation: createEmptyNavigation(),
+    sections: {},
+  });
   const draftScriptsRef = useRef<Record<number, string>>({});
   const editorRef = useRef<HTMLDivElement | null>(null);
   const measurementRef = useRef<HTMLDivElement | null>(null);
   const [paragraphMetrics, setParagraphMetrics] = useState<ParagraphMetric[]>([]);
 
-  const currentSection = SALES_SECTIONS.find((s) => s.id === activeSection)!;
+  const activeSubThemeId = activeSubThemeIdByTheme[contentTheme];
+  const currentSubTheme = useMemo(() => {
+    const list = workspaceV2State.navigation.themes[contentTheme]?.subThemes ?? [];
+    return list.find((sub) => sub.id === activeSubThemeId) ?? null;
+  }, [workspaceV2State.navigation, contentTheme, activeSubThemeId]);
+  const currentChapters: ChapterEntry[] = useMemo(
+    () => currentSubTheme?.chapters ?? [],
+    [currentSubTheme]
+  );
+  const currentSection =
+    currentChapters.find((c) => c.id === activeSection) ?? currentChapters[0] ?? null;
   const sectionProgress = useMemo(() => {
-    return SALES_SECTIONS.reduce<Record<number, { approved: number; total: number }>>(
-      (acc, section) => {
+    return currentChapters.reduce<Record<number, { approved: number; total: number }>>(
+      (acc, chapter) => {
         const scriptText =
-          (editedScripts[section.id] ??
-            CHAPTER_DEFAULTS[section.id] ??
-            CHAPTER_DEFAULTS[2]) || "";
-        acc[section.id] = computeSectionProgress(
+          editedScripts[chapter.id] ?? CHAPTER_DEFAULTS[chapter.id] ?? "";
+        acc[chapter.id] = computeSectionProgress(
           scriptText,
-          workspaceV2State.sections[section.id]?.paragraphs,
-          generatedSlidesBySection[section.id]
+          workspaceV2State.sections[chapter.id]?.paragraphs,
+          generatedSlidesBySection[chapter.id]
         );
         return acc;
       },
       {}
     );
-  }, [editedScripts, workspaceV2State, generatedSlidesBySection]);
+  }, [currentChapters, editedScripts, workspaceV2State, generatedSlidesBySection]);
   const sectionTotalApproved = Object.values(sectionProgress).reduce(
     (sum, p) => sum + p.approved,
     0
@@ -695,9 +838,7 @@ export function SlideWorkspace() {
     0
   );
   const savedScriptText =
-    editedScripts[activeSection] ??
-    CHAPTER_DEFAULTS[activeSection] ??
-    CHAPTER_DEFAULTS[2];
+    editedScripts[activeSection] ?? CHAPTER_DEFAULTS[activeSection] ?? "";
   const currentScriptText = draftScriptsRef.current[activeSection] ?? savedScriptText;
   const currentScript = useMemo(
     () => parseScript(currentScriptText, { keepEmpty: true }),
@@ -852,10 +993,7 @@ export function SlideWorkspace() {
         if (!isMounted || !result.state) return;
 
         const state = result.state as Partial<WorkspacePersistedState>;
-        if (
-          typeof state.activeSection === "number" &&
-          SALES_SECTIONS.some((section) => section.id === state.activeSection)
-        ) {
+        if (typeof state.activeSection === "number") {
           setActiveSection(state.activeSection);
         }
         if (state.contentTheme) setContentTheme(state.contentTheme);
@@ -908,16 +1046,24 @@ export function SlideWorkspace() {
         const result = await response.json();
         if (!isMounted) return;
 
-        const nextState =
+        const raw =
           result.state && typeof result.state === "object"
-            ? (result.state as WorkspaceV2State)
-            : { sections: {} };
+            ? (result.state as Partial<WorkspaceV2State>)
+            : null;
+        const nextState: WorkspaceV2State = {
+          navigation: ensureNavigation(raw?.navigation),
+          sections: raw?.sections ?? {},
+        };
         workspaceV2StateRef.current = nextState;
         setWorkspaceV2State(nextState);
       } catch {
         if (!isMounted) return;
-        workspaceV2StateRef.current = { sections: {} };
-        setWorkspaceV2State({ sections: {} });
+        const fallback: WorkspaceV2State = {
+          navigation: buildDefaultNavigation(),
+          sections: {},
+        };
+        workspaceV2StateRef.current = fallback;
+        setWorkspaceV2State(fallback);
       } finally {
         if (isMounted) setWorkspaceV2Ready(true);
       }
@@ -932,6 +1078,32 @@ export function SlideWorkspace() {
   useEffect(() => {
     workspaceV2StateRef.current = workspaceV2State;
   }, [workspaceV2State]);
+
+  // 大テーマを切り替えた / 小テーマが削除されたときに activeSubTheme を補正
+  useEffect(() => {
+    if (!workspaceV2Ready) return;
+    const subThemes = workspaceV2State.navigation.themes[contentTheme]?.subThemes ?? [];
+    const currentId = activeSubThemeIdByTheme[contentTheme];
+    if (currentId && subThemes.some((s) => s.id === currentId)) return;
+    const fallback = subThemes[0]?.id ?? null;
+    if (currentId !== fallback) {
+      setActiveSubThemeIdByTheme((prev) => ({ ...prev, [contentTheme]: fallback }));
+    }
+  }, [
+    contentTheme,
+    workspaceV2State.navigation,
+    activeSubThemeIdByTheme,
+    workspaceV2Ready,
+  ]);
+
+  // 小テーマ / 章リスト変化に応じて activeSection を補正
+  useEffect(() => {
+    if (!workspaceV2Ready) return;
+    if (currentChapters.length === 0) return;
+    if (!currentChapters.some((c) => c.id === activeSection)) {
+      setActiveSection(currentChapters[0].id);
+    }
+  }, [currentChapters, activeSection, workspaceV2Ready]);
 
   useEffect(() => {
     if (!workspaceV2Ready) return;
@@ -1172,12 +1344,11 @@ export function SlideWorkspace() {
       imagePath: string;
     }> = [];
 
-    for (const section of SALES_SECTIONS) {
-      const scriptText =
-        editedScripts[section.id] ?? CHAPTER_DEFAULTS[section.id] ?? CHAPTER_DEFAULTS[2];
+    for (const chapter of currentChapters) {
+      const scriptText = editedScripts[chapter.id] ?? CHAPTER_DEFAULTS[chapter.id] ?? "";
       const blocks = parseScript(scriptText);
-      const paragraphSettings = workspaceV2State.sections[section.id]?.paragraphs ?? [];
-      const savedSlides = generatedSlidesBySection[section.id] ?? [];
+      const paragraphSettings = workspaceV2State.sections[chapter.id]?.paragraphs ?? [];
+      const savedSlides = generatedSlidesBySection[chapter.id] ?? [];
       for (let i = 0; i < blocks.length; i += 1) {
         const setting = paragraphSettings[i];
         if (!setting || !setting.approvedImagePath) continue;
@@ -1189,8 +1360,8 @@ export function SlideWorkspace() {
         );
         if (!matched || !matched.imagePath) continue;
         slides.push({
-          chapterNum: section.id,
-          chapterTitle: section.title,
+          chapterNum: chapter.id,
+          chapterTitle: chapter.title,
           slideNum: i + 1,
           imagePath: matched.imagePath,
         });
@@ -1237,6 +1408,228 @@ export function SlideWorkspace() {
     } finally {
       setExportStatus("idle");
     }
+  }
+
+  function updateNavigation(updater: (nav: NavigationState) => NavigationState) {
+    setWorkspaceV2State((prev) => ({
+      ...prev,
+      navigation: updater(prev.navigation),
+    }));
+  }
+
+  function removeChapterRelatedState(chapterIds: number[]) {
+    const purge = <T,>(rec: Record<number, T>): Record<number, T> => {
+      const next: Record<number, T> = { ...rec };
+      chapterIds.forEach((id) => delete next[id]);
+      return next;
+    };
+    setEditedScripts((prev) => purge(prev));
+    setGeneratedSlidesBySection((prev) => purge(prev));
+    setSelectedGeneratedSlidesBySection((prev) => purge(prev));
+    setGenerationHistoryBySection((prev) => purge(prev));
+    setLatestGenerationSnapshotBySection((prev) => purge(prev));
+    setCurrentGenerationSourceLabelBySection((prev) => purge(prev));
+    setCurrentGenerationScriptTextBySection((prev) => purge(prev));
+    chapterIds.forEach((id) => {
+      delete draftScriptsRef.current[id];
+    });
+  }
+
+  function addSubTheme(theme: ContentTheme) {
+    const subThemeId = `sub-${Date.now()}`;
+    const nextChapterId = computeNextChapterId(workspaceV2StateRef.current.navigation);
+    const newChapter: ChapterEntry = { id: nextChapterId, title: "1. 新しい章" };
+    updateNavigation((nav) => ({
+      ...nav,
+      themes: {
+        ...nav.themes,
+        [theme]: {
+          subThemes: [
+            ...nav.themes[theme].subThemes,
+            { id: subThemeId, name: "新しい小テーマ", chapters: [newChapter] },
+          ],
+        },
+      },
+    }));
+    setActiveSubThemeIdByTheme((prev) => ({ ...prev, [theme]: subThemeId }));
+    setContentTheme(theme);
+    setActiveSection(nextChapterId);
+    setRenamingSubThemeId(subThemeId);
+  }
+
+  function renameSubTheme(theme: ContentTheme, subThemeId: string, newName: string) {
+    const trimmed = newName.trim();
+    setRenamingSubThemeId(null);
+    if (!trimmed) return;
+    updateNavigation((nav) => ({
+      ...nav,
+      themes: {
+        ...nav.themes,
+        [theme]: {
+          subThemes: nav.themes[theme].subThemes.map((sub) =>
+            sub.id === subThemeId ? { ...sub, name: trimmed } : sub
+          ),
+        },
+      },
+    }));
+  }
+
+  function requestDeleteSubTheme(theme: ContentTheme, subThemeId: string) {
+    const sub = workspaceV2StateRef.current.navigation.themes[theme].subThemes.find(
+      (s) => s.id === subThemeId
+    );
+    if (!sub) return;
+    const approvedCount = countApprovedSlidesForSubTheme(
+      sub,
+      workspaceV2StateRef.current.sections
+    );
+    if (approvedCount > 0) {
+      setConfirmState({
+        title: "削除できません",
+        message: `「${sub.name}」配下に採用済みスライドが${approvedCount}枚あります。各スライドの「採用解除」を押してから、もう一度削除してください。`,
+        onConfirm: null,
+      });
+      return;
+    }
+    setConfirmState({
+      title: "小テーマを削除",
+      message: `「${sub.name}」とその配下の${sub.chapters.length}章をすべて削除します。原稿・採用状態・生成スライドメタも消えます。続けますか？`,
+      onConfirm: () => {
+        const chapterIds = sub.chapters.map((c) => c.id);
+        setWorkspaceV2State((prev) => {
+          const nextSections = { ...prev.sections };
+          chapterIds.forEach((id) => delete nextSections[id]);
+          return {
+            ...prev,
+            navigation: {
+              ...prev.navigation,
+              themes: {
+                ...prev.navigation.themes,
+                [theme]: {
+                  subThemes: prev.navigation.themes[theme].subThemes.filter(
+                    (s) => s.id !== subThemeId
+                  ),
+                },
+              },
+            },
+            sections: nextSections,
+          };
+        });
+        removeChapterRelatedState(chapterIds);
+        const remaining = workspaceV2StateRef.current.navigation.themes[theme].subThemes.filter(
+          (s) => s.id !== subThemeId
+        );
+        const nextActiveSubTheme = remaining[0]?.id ?? null;
+        setActiveSubThemeIdByTheme((prev) => ({ ...prev, [theme]: nextActiveSubTheme }));
+        const nextActiveChapter = remaining[0]?.chapters[0]?.id;
+        if (nextActiveChapter !== undefined) setActiveSection(nextActiveChapter);
+        setConfirmState(null);
+      },
+    });
+  }
+
+  function addChapter() {
+    if (!currentSubTheme) return;
+    const nextId = computeNextChapterId(workspaceV2StateRef.current.navigation);
+    const chapterIndex = currentSubTheme.chapters.length + 1;
+    const newChapter: ChapterEntry = {
+      id: nextId,
+      title: `${chapterIndex}. 新しい章`,
+    };
+    const subThemeId = currentSubTheme.id;
+    const themeKey = contentTheme;
+    updateNavigation((nav) => ({
+      ...nav,
+      themes: {
+        ...nav.themes,
+        [themeKey]: {
+          subThemes: nav.themes[themeKey].subThemes.map((sub) =>
+            sub.id === subThemeId
+              ? { ...sub, chapters: [...sub.chapters, newChapter] }
+              : sub
+          ),
+        },
+      },
+    }));
+    setActiveSection(nextId);
+    setRenamingChapterId(nextId);
+  }
+
+  function renameChapter(chapterId: number, newTitle: string) {
+    const trimmed = newTitle.trim();
+    setRenamingChapterId(null);
+    if (!trimmed) return;
+    updateNavigation((nav) => {
+      const themes = { ...nav.themes } as NavigationState["themes"];
+      (Object.keys(themes) as ContentTheme[]).forEach((themeKey) => {
+        themes[themeKey] = {
+          subThemes: themes[themeKey].subThemes.map((sub) => ({
+            ...sub,
+            chapters: sub.chapters.map((c) =>
+              c.id === chapterId ? { ...c, title: trimmed } : c
+            ),
+          })),
+        };
+      });
+      return { ...nav, themes };
+    });
+  }
+
+  function requestDeleteChapter(chapterId: number) {
+    const location = findChapterLocation(workspaceV2StateRef.current.navigation, chapterId);
+    if (!location) return;
+    const chapter = workspaceV2StateRef.current.navigation.themes[location.theme].subThemes
+      .find((s) => s.id === location.subThemeId)
+      ?.chapters.find((c) => c.id === chapterId);
+    if (!chapter) return;
+    const approvedCount = countApprovedSlidesForChapter(
+      chapterId,
+      workspaceV2StateRef.current.sections
+    );
+    if (approvedCount > 0) {
+      setConfirmState({
+        title: "削除できません",
+        message: `「${chapter.title}」には採用済みスライドが${approvedCount}枚あります。各スライドの「採用解除」を押してから、もう一度削除してください。`,
+        onConfirm: null,
+      });
+      return;
+    }
+    setConfirmState({
+      title: "章を削除",
+      message: `「${chapter.title}」を削除します。原稿・採用状態・生成スライドメタも消えます。続けますか？`,
+      onConfirm: () => {
+        setWorkspaceV2State((prev) => {
+          const nextSections = { ...prev.sections };
+          delete nextSections[chapterId];
+          return {
+            ...prev,
+            navigation: {
+              ...prev.navigation,
+              themes: {
+                ...prev.navigation.themes,
+                [location.theme]: {
+                  subThemes: prev.navigation.themes[location.theme].subThemes.map((sub) =>
+                    sub.id === location.subThemeId
+                      ? { ...sub, chapters: sub.chapters.filter((c) => c.id !== chapterId) }
+                      : sub
+                  ),
+                },
+              },
+            },
+            sections: nextSections,
+          };
+        });
+        removeChapterRelatedState([chapterId]);
+        if (activeSection === chapterId) {
+          const remaining =
+            workspaceV2StateRef.current.navigation.themes[location.theme].subThemes
+              .find((s) => s.id === location.subThemeId)
+              ?.chapters.filter((c) => c.id !== chapterId) ?? [];
+          if (remaining.length > 0) setActiveSection(remaining[0].id);
+        }
+        setConfirmState(null);
+      },
+    });
   }
 
   function toggleApprovedForSelected() {
@@ -1459,7 +1852,7 @@ export function SlideWorkspace() {
   async function handleGenerateSection() {
     if (currentScript.length === 0) return;
     const sectionId = activeSection;
-    const sectionTitle = currentSection.title;
+    const sectionTitle = (currentSection?.title ?? "");
     const sourceScriptText = currentScriptText;
     const scriptBlocks = currentScript;
     const generationColorTheme = colorTheme;
@@ -1658,7 +2051,7 @@ export function SlideWorkspace() {
 
     try {
       const imagePath = await generateSlideImage(targetSlide, {
-        sectionTitle: `${currentSection.title} / ${targetSlide.num}枚目`,
+        sectionTitle: `${(currentSection?.title ?? "")} / ${targetSlide.num}枚目`,
         template: templateForSlide.id,
         illustration: illustrationForSlide.label,
         colorTheme,
@@ -1796,10 +2189,11 @@ export function SlideWorkspace() {
     updateWholeScriptText(event.currentTarget.innerText);
   }
 
-  const headerTitle =
-    contentTheme === "bootcamp"
-      ? "Claude Code ブートキャンプ販売セミナー"
-      : "講義スライド作業場";
+  const bigThemeLabel = contentTheme === "bootcamp" ? "CCブートキャンプ" : "講義スライド";
+  const smallThemeLabel = currentSubTheme?.name ?? "";
+  const headerTitle = smallThemeLabel
+    ? `${bigThemeLabel} / ${smallThemeLabel}`
+    : bigThemeLabel;
 
   return (
     <main className="h-screen w-screen overflow-hidden bg-[#f8fafc] text-[#162033]">
@@ -1821,45 +2215,109 @@ export function SlideWorkspace() {
                 全体カリキュラム
               </div>
             </div>
-            <nav className="grid gap-1">
-              <button
-                type="button"
-                onClick={() => setContentTheme("lecture")}
-                className={`flex items-center gap-2 min-h-[38px] px-2.5 rounded-[10px] text-left text-[12px] font-semibold transition-colors ${
-                  contentTheme === "lecture"
-                    ? "bg-slate-100 text-[#0f2f46] font-extrabold shadow-[inset_0_0_0_1px_rgba(15,47,70,0.04)]"
-                    : "text-slate-600 hover:bg-slate-50"
-                }`}
-              >
-                <span className="inline-flex w-4 h-4 rounded-[4px] border border-slate-300 bg-slate-50 items-center justify-center">
-                  <span className="w-1.5 h-1.5 rounded-sm bg-slate-500" />
-                </span>
-                <span className="truncate">講義スライド</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setContentTheme("bootcamp")}
-                className={`flex items-center gap-2 min-h-[38px] px-2.5 rounded-[10px] text-left text-[12px] font-semibold transition-colors ${
-                  contentTheme === "bootcamp"
-                    ? "bg-slate-100 text-[#0f2f46] font-extrabold shadow-[inset_0_0_0_1px_rgba(15,47,70,0.04)]"
-                    : "text-slate-600 hover:bg-slate-50"
-                }`}
-              >
-                <span className="inline-flex w-4 h-4 rounded-[4px] border border-slate-300 bg-slate-50 items-center justify-center">
-                  <span className="w-1.5 h-1.5 rounded-sm bg-slate-500" />
-                </span>
-                <span className="truncate">Claude Code ブートキャンプ販売スライド</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => alert("テーマ追加は次フェーズで実装予定です")}
-                className="flex items-center gap-2 min-h-[38px] px-2.5 mt-2 rounded-[10px] text-left text-[12px] font-semibold text-slate-400 border border-dashed border-slate-300 hover:bg-slate-50"
-              >
-                <span className="inline-flex w-4 h-4 items-center justify-center text-slate-400">
-                  +
-                </span>
-                <span className="truncate">テーマを追加</span>
-              </button>
+            <nav className="grid gap-3 overflow-y-auto pr-1">
+              {(["lecture", "bootcamp"] as const).map((themeKey) => {
+                const themeLabel = themeKey === "bootcamp" ? "CCブートキャンプ" : "講義スライド";
+                const themeSubs =
+                  workspaceV2State.navigation.themes[themeKey]?.subThemes ?? [];
+                const themeActive = contentTheme === themeKey;
+                return (
+                  <div key={themeKey} className="grid gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setContentTheme(themeKey)}
+                      className={`flex items-center gap-2 min-h-[34px] px-2.5 rounded-[10px] text-left text-[12px] font-extrabold transition-colors ${
+                        themeActive
+                          ? "bg-slate-100 text-[#0f2f46]"
+                          : "text-slate-700 hover:bg-slate-50"
+                      }`}
+                    >
+                      <span className="inline-flex w-4 h-4 rounded-[4px] border border-slate-300 bg-slate-50 items-center justify-center">
+                        <span className="w-1.5 h-1.5 rounded-sm bg-slate-500" />
+                      </span>
+                      <span className="truncate">{themeLabel}</span>
+                    </button>
+                    <div className="grid gap-0.5 pl-3">
+                      {themeSubs.map((sub) => {
+                        const subActive =
+                          themeActive && activeSubThemeId === sub.id;
+                        const isRenaming = renamingSubThemeId === sub.id;
+                        return (
+                          <div
+                            key={sub.id}
+                            className={`group flex items-center gap-1 min-h-[32px] px-2 rounded-[8px] text-[12px] transition-colors ${
+                              subActive
+                                ? "bg-[#eef3f8] text-[#0f2f46] font-extrabold"
+                                : "text-slate-600 hover:bg-slate-50"
+                            }`}
+                          >
+                            {isRenaming ? (
+                              <input
+                                autoFocus
+                                defaultValue={sub.name}
+                                onBlur={(e) => renameSubTheme(themeKey, sub.id, e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    renameSubTheme(themeKey, sub.id, e.currentTarget.value);
+                                  } else if (e.key === "Escape") {
+                                    setRenamingSubThemeId(null);
+                                  }
+                                }}
+                                className="flex-1 min-w-0 px-1.5 py-1 border border-[#0f5f7a] rounded text-[12px] bg-white"
+                              />
+                            ) : (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setContentTheme(themeKey);
+                                    setActiveSubThemeIdByTheme((prev) => ({
+                                      ...prev,
+                                      [themeKey]: sub.id,
+                                    }));
+                                    const firstChapter = sub.chapters[0];
+                                    if (firstChapter) setActiveSection(firstChapter.id);
+                                  }}
+                                  className="flex-1 min-w-0 truncate text-left"
+                                >
+                                  {sub.name}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setRenamingSubThemeId(sub.id)}
+                                  aria-label="名前を編集"
+                                  className="inline-flex items-center justify-center w-6 h-6 rounded text-slate-400 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity hover:text-[#0f5f7a] hover:bg-white"
+                                  title="名前を編集"
+                                >
+                                  ✎
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => requestDeleteSubTheme(themeKey, sub.id)}
+                                  aria-label="この小テーマを削除"
+                                  className="inline-flex items-center justify-center w-6 h-6 rounded text-slate-400 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity hover:text-red-600 hover:bg-white"
+                                  title="削除"
+                                >
+                                  ×
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        );
+                      })}
+                      <button
+                        type="button"
+                        onClick={() => addSubTheme(themeKey)}
+                        className="flex items-center gap-1.5 min-h-[28px] px-2 rounded-[8px] text-left text-[11px] font-semibold text-slate-400 hover:bg-slate-50 hover:text-[#0f5f7a]"
+                      >
+                        <span>+</span>
+                        <span>小テーマを追加</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </nav>
             <div className="mt-auto pt-4 border-t border-slate-200/50 text-[11px] text-slate-400 leading-[1.6]">
               テーマ内容: {contentTheme === "bootcamp" ? "Claude Code 販売" : "講義"}
@@ -1878,39 +2336,98 @@ export function SlideWorkspace() {
             </p>
           </header>
           <div className="px-3.5 py-3 overflow-auto flex-1">
-            <div className="grid gap-1">
-              {SALES_SECTIONS.map((section) => {
-                const progress = sectionProgress[section.id] ?? { approved: 0, total: 0 };
-                const isComplete =
-                  progress.total > 0 && progress.approved >= progress.total;
-                const isActive = activeSection === section.id;
-                return (
-                  <button
-                    key={section.id}
-                    type="button"
-                    onClick={() => setActiveSection(section.id)}
-                    className={`grid grid-cols-[1fr_auto] gap-3 items-start min-h-[42px] px-3 py-2.5 rounded-[10px] text-left text-[12px] transition-colors ${
-                      isActive
-                        ? "bg-[#eef3f8] text-[#0f2f46] font-extrabold"
-                        : "text-slate-600 hover:bg-slate-50"
-                    }`}
-                  >
-                    <span className="truncate leading-[1.7]">{section.title}</span>
-                    <span
-                      className={`text-[11px] leading-[1.7] whitespace-nowrap ${
-                        isComplete
-                          ? "text-emerald-600 font-bold"
-                          : isActive
-                            ? "text-[#0f2f46]"
-                            : "text-slate-400"
+            {currentSubTheme ? (
+              <div className="grid gap-1">
+                {currentChapters.map((chapter) => {
+                  const progress = sectionProgress[chapter.id] ?? { approved: 0, total: 0 };
+                  const isComplete = progress.total > 0 && progress.approved >= progress.total;
+                  const isActive = activeSection === chapter.id;
+                  const isRenaming = renamingChapterId === chapter.id;
+                  return (
+                    <div
+                      key={chapter.id}
+                      className={`group grid grid-cols-[1fr_auto] gap-2 items-center min-h-[42px] px-3 py-2 rounded-[10px] transition-colors ${
+                        isActive
+                          ? "bg-[#eef3f8] text-[#0f2f46] font-extrabold"
+                          : "text-slate-600 hover:bg-slate-50"
                       }`}
                     >
-                      {progress.approved}/{progress.total}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+                      {isRenaming ? (
+                        <input
+                          autoFocus
+                          defaultValue={chapter.title}
+                          onBlur={(e) => renameChapter(chapter.id, e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              renameChapter(chapter.id, e.currentTarget.value);
+                            } else if (e.key === "Escape") {
+                              setRenamingChapterId(null);
+                            }
+                          }}
+                          className="col-span-2 min-w-0 px-2 py-1 border border-[#0f5f7a] rounded text-[12px] bg-white text-slate-800 font-semibold"
+                        />
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => setActiveSection(chapter.id)}
+                            className="min-w-0 text-left text-[12px] truncate leading-[1.7]"
+                          >
+                            {chapter.title}
+                          </button>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => setRenamingChapterId(chapter.id)}
+                              aria-label="章タイトルを編集"
+                              title="編集"
+                              className="inline-flex items-center justify-center w-6 h-6 rounded text-slate-400 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity hover:text-[#0f5f7a] hover:bg-white"
+                            >
+                              ✎
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => requestDeleteChapter(chapter.id)}
+                              aria-label="この章を削除"
+                              title="削除"
+                              className="inline-flex items-center justify-center w-6 h-6 rounded text-slate-400 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity hover:text-red-600 hover:bg-white"
+                            >
+                              ×
+                            </button>
+                            <span
+                              className={`text-[11px] leading-[1.7] whitespace-nowrap ${
+                                isComplete
+                                  ? "text-emerald-600 font-bold"
+                                  : isActive
+                                    ? "text-[#0f2f46]"
+                                    : "text-slate-400"
+                              }`}
+                            >
+                              {progress.approved}/{progress.total}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+                <button
+                  type="button"
+                  onClick={addChapter}
+                  className="flex items-center gap-1.5 mt-1 min-h-[36px] px-3 rounded-[10px] text-left text-[12px] font-semibold text-slate-400 border border-dashed border-slate-300 hover:bg-slate-50 hover:text-[#0f5f7a] hover:border-[#0f5f7a]"
+                >
+                  <span>+</span>
+                  <span>章を追加</span>
+                </button>
+              </div>
+            ) : (
+              <div className="rounded-[10px] border border-dashed border-slate-300 bg-slate-50 px-3 py-6 text-[12px] leading-[1.7] text-slate-500 text-center">
+                小テーマがまだありません。
+                <br />
+                1区から「+ 小テーマを追加」してください。
+              </div>
+            )}
           </div>
           <footer className="mt-auto border-t border-slate-200/50 p-4 text-[12px] text-slate-500 leading-[1.8]">
             進捗 {sectionTotalApproved}/{sectionTotalSlides}枚
@@ -1927,7 +2444,7 @@ export function SlideWorkspace() {
                 3 / 原稿編集
               </div>
               <div className="truncate text-[15px] font-black text-[#172033] leading-tight mt-1">
-                {currentSection.title}
+                {(currentSection?.title ?? "")}
               </div>
             </div>
           </div>
@@ -2566,6 +3083,56 @@ export function SlideWorkspace() {
               >
                 閉じる
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* === 削除確認ダイアログ === */}
+      {confirmState && (
+        <div
+          className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+          onClick={() => setConfirmState(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="bg-white rounded-2xl max-w-[440px] w-full p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-[16px] font-black text-slate-800 mb-2">
+              {confirmState.title}
+            </h2>
+            <p className="text-[13px] leading-[1.7] text-slate-600 mb-5">
+              {confirmState.message}
+            </p>
+            <div className="flex justify-end gap-2">
+              {confirmState.onConfirm ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmState(null)}
+                    className="px-4 py-2 border border-slate-200 rounded-lg bg-white text-slate-600 text-[12px] font-extrabold hover:bg-slate-50"
+                  >
+                    キャンセル
+                  </button>
+                  <button
+                    type="button"
+                    onClick={confirmState.onConfirm}
+                    className="px-4 py-2 rounded-lg bg-red-600 text-white text-[12px] font-extrabold hover:bg-red-700"
+                  >
+                    {confirmState.confirmLabel ?? "削除する"}
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setConfirmState(null)}
+                  className="px-4 py-2 rounded-lg bg-[#0f5f7a] text-white text-[12px] font-extrabold hover:bg-[#0d4f66]"
+                >
+                  OK
+                </button>
+              )}
             </div>
           </div>
         </div>
