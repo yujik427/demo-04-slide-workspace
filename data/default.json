@@ -1,0 +1,148 @@
+{
+  "metadata": {
+    "title": "本質のClaude Code 完全攻略 7dayブートキャンプ",
+    "audience": "AIを仕事に活かしたい未経験者・副業希望者",
+    "tone": "実戦的・具体的・煽りすぎない",
+    "theme": "default"
+  },
+  "slides": [
+    {
+      "index": 1,
+      "type": "cover",
+      "eyebrow": "7日間オンラインブートキャンプ",
+      "title": "7日後、AIに仕事をさせる側に立つ。",
+      "subtitle": "Claude Codeで月10万円案件を獲得するスキルを手にする。",
+      "highlight": null,
+      "highlight_suffix": null,
+      "body": [],
+      "footer": "本質のClaude Code 完全攻略 7dayブートキャンプ",
+      "cta": null
+    },
+    {
+      "index": 2,
+      "type": "problem",
+      "eyebrow": "現状",
+      "title": "リサーチ、コピペ、整形、送信。気づけば1日が終わる。",
+      "subtitle": "AIに興味はある。でも「仕事を任せる」までは遠い。",
+      "highlight": null,
+      "highlight_suffix": null,
+      "body": [
+        "ChatGPTは触った。でも案件獲得には繋がっていない。",
+        "副業は欲しい。プログラミング未経験のまま時間だけが過ぎる。",
+        "Claude Codeを仕事で使う日本人は、まだ0.1%未満。"
+      ],
+      "footer": "本質のClaude Code 完全攻略 7dayブートキャンプ",
+      "cta": null
+    },
+    {
+      "index": 3,
+      "type": "tool",
+      "eyebrow": "あなたが受け取る武器",
+      "title": "「案件探索ツール」で、案件獲得を自動化。",
+      "subtitle": "案件探索・営業文作成・送信先整理まで、日本語で話すだけ。",
+      "highlight": "月4,500万円",
+      "highlight_suffix": "を支える本物のシステム",
+      "body": [
+        "アドネスの月商を支える、佐藤将司が設計した中核ツール。",
+        "営業初月で1,000万円案件を獲得した実績を持つ。",
+        "受講生はAIが生成した応募文をコピペして送るだけ。"
+      ],
+      "footer": "本質のClaude Code 完全攻略 7dayブートキャンプ",
+      "cta": null
+    },
+    {
+      "index": 4,
+      "type": "instructor",
+      "eyebrow": "教える人間",
+      "title": "今もAIで数億円規模の事業を回す、現役プレイヤー。",
+      "subtitle": "講師・佐藤将司",
+      "highlight": null,
+      "highlight_suffix": null,
+      "body": [
+        "未経験からClaude Codeで100システム以上を構築。",
+        "1期生は未経験から7日でシステムを完成させた。",
+        "再現性はすでに証明されている。"
+      ],
+      "footer": "本質のClaude Code 完全攻略 7dayブートキャンプ",
+      "cta": null
+    },
+    {
+      "index": 5,
+      "type": "curriculum",
+      "eyebrow": "学ぶ内容",
+      "title": "30万円相当のテーマを、7日で網羅する。",
+      "subtitle": "月・水・金・土の全4回、各2時間、21時開始。",
+      "highlight": null,
+      "highlight_suffix": null,
+      "body": [
+        "LP制作／案件探索／スライド制作／X投稿／LINE Bot",
+        "動画編集／SEO記事生成／PPTX自動作成",
+        "全テーマがそのまま受注可能なスキルになる。"
+      ],
+      "footer": "本質のClaude Code 完全攻略 7dayブートキャンプ",
+      "cta": null
+    },
+    {
+      "index": 6,
+      "type": "bonuses",
+      "eyebrow": "配布される特典",
+      "title": "アドネス社内専用システム12種を丸ごと配布。",
+      "subtitle": "中核は佐藤が今も使い続けている「案件探索ツール」。",
+      "highlight": "173.6万円",
+      "highlight_suffix": "相当のシステム群",
+      "body": [
+        "1on1コンサル2時間（5万円相当）付き。",
+        "本編後1ヶ月の補講サポート（5万円相当）付き。",
+        "コミュニティで質問は投げ放題。"
+      ],
+      "footer": "本質のClaude Code 完全攻略 7dayブートキャンプ",
+      "cta": null
+    },
+    {
+      "index": 7,
+      "type": "value_compare",
+      "eyebrow": "価値と価格",
+      "title": "総額248万5,000円相当を、税込217,800円で。",
+      "subtitle": "月10万円案件を2件取れば、受講料は全額回収できる。",
+      "highlight": "1日251円",
+      "highlight_suffix": "の投資",
+      "body": [
+        "Claude Codeの利用コストは月3,000円のみ。",
+        "AI講座ではない。案件を取りにいく実戦ブートキャンプ。"
+      ],
+      "footer": "本質のClaude Code 完全攻略 7dayブートキャンプ",
+      "cta": null
+    },
+    {
+      "index": 8,
+      "type": "objections",
+      "eyebrow": "反論への答え",
+      "title": "未経験・多忙・不安。すべて先回りで潰してある。",
+      "subtitle": null,
+      "highlight": null,
+      "highlight_suffix": null,
+      "body": [
+        "Q. プログラミング未経験 → 日本語で話しかけるだけで動く。",
+        "Q. 忙しい → 予習1日30分、本番は21時から2時間だけ。",
+        "Q. ついていけるか不安 → 予習・本番・1ヶ月補講の3段階で支える。"
+      ],
+      "footer": "本質のClaude Code 完全攻略 7dayブートキャンプ",
+      "cta": null
+    },
+    {
+      "index": 9,
+      "type": "cta",
+      "eyebrow": "最後に",
+      "title": "0.1%未満の側に、今のうちに回る。",
+      "subtitle": "Claude Codeを仕事で使う日本人がまだ0.1%未満の今、動く。",
+      "highlight": null,
+      "highlight_suffix": null,
+      "body": [
+        "10%、30%になったとき、先頭と後追いの差は埋まらない。",
+        "7日後、AIに仕事をさせる側へ回る。"
+      ],
+      "footer": "本質のClaude Code 完全攻略 7dayブートキャンプ",
+      "cta": "今すぐ申し込む"
+    }
+  ]
+}

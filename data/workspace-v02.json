@@ -1,0 +1,122 @@
+{
+  "brief": {
+    "name": "サンプル講座告知",
+    "product": "7日間オンライン実践講座",
+    "purpose": "講座の価値を短時間で伝え、申込み判断まで進める",
+    "audience": "AIを仕事に活かしたい未経験者・副業希望者",
+    "tone": "実戦的・具体的・煽りすぎない",
+    "deckName": "講座募集スライド v0.2",
+    "status": "原稿サンプル作成中"
+  },
+  "sourceDraft": {
+    "title": "講座募集用の原稿サンプル",
+    "status": "drafting",
+    "sections": [
+      {
+        "heading": "読者の現状",
+        "body": "AIツールには触れているが、案件獲得や実務の成果にはまだつながっていない。学習時間は増えているのに、何を作れば仕事になるのかが見えていない。",
+        "signals": ["不安", "未経験", "時間不足"]
+      },
+      {
+        "heading": "講座で得られるもの",
+        "body": "案件探索、営業文作成、スライド制作、投稿作成など、実務でそのまま使える制作手順を7日間で体験する。完成物を持ち帰れるため、学習で終わりにくい。",
+        "signals": ["実務直結", "完成物", "短期集中"]
+      },
+      {
+        "heading": "判断材料",
+        "body": "高額に見える受講料も、月10万円の案件を2件取れば回収できる。必要なツール費用は小さく、主な投資は実践時間である。",
+        "signals": ["費用回収", "数字", "投資判断"]
+      },
+      {
+        "heading": "最後の行動",
+        "body": "先に実務で使い始めた人ほど、制作実績と改善回数が積み上がる。まずは7日間で、AIに仕事を任せる側の体験を作る。",
+        "signals": ["行動喚起", "先行者", "体験"]
+      }
+    ]
+  },
+  "extractedParts": [
+    {
+      "id": "part-appeal-01",
+      "kind": "appeal",
+      "label": "主訴求",
+      "source": "AIツールには触れているが、案件獲得や実務の成果にはまだつながっていない。",
+      "slideText": "AIを触る側から、仕事を任せる側へ。",
+      "targetSlideIndexes": [1, 9],
+      "status": "auto"
+    },
+    {
+      "id": "part-objection-01",
+      "kind": "objection",
+      "label": "未経験不安",
+      "source": "何を作れば仕事になるのかが見えていない。",
+      "slideText": "未経験でも、作る順番が見えれば実務に変わる。",
+      "targetSlideIndexes": [2, 8],
+      "status": "needs_review"
+    },
+    {
+      "id": "part-proof-01",
+      "kind": "proof",
+      "label": "完成物",
+      "source": "完成物を持ち帰れるため、学習で終わりにくい。",
+      "slideText": "学習ではなく、持ち帰れる制作物を作る。",
+      "targetSlideIndexes": [3, 5],
+      "status": "auto"
+    },
+    {
+      "id": "part-number-01",
+      "kind": "number",
+      "label": "費用回収",
+      "source": "月10万円の案件を2件取れば回収できる。",
+      "slideText": "月10万円案件を2件取れば、受講料は回収できる。",
+      "targetSlideIndexes": [7],
+      "status": "auto"
+    },
+    {
+      "id": "part-cta-01",
+      "kind": "cta",
+      "label": "申込み導線",
+      "source": "まずは7日間で、AIに仕事を任せる側の体験を作る。",
+      "slideText": "7日後、仕事を任せる側へ回る。",
+      "targetSlideIndexes": [9],
+      "status": "edited"
+    },
+    {
+      "id": "part-visual-01",
+      "kind": "visual",
+      "label": "イラスト指示",
+      "source": "制作実績と改善回数が積み上がる。",
+      "slideText": "暗い作業机から、制作物が積み上がる明るいワークスペースへ変化するイメージ",
+      "targetSlideIndexes": [1, 9],
+      "status": "needs_review"
+    }
+  ],
+  "slidePlan": [
+    {
+      "slideIndex": 1,
+      "role": "第一印象で変化を伝える",
+      "partIds": ["part-appeal-01", "part-visual-01"],
+      "visualPrompt": "作業机の上に複数の制作物が並び、画面の光で前向きな雰囲気が出ている"
+    },
+    {
+      "slideIndex": 2,
+      "role": "現状の詰まりを言語化する",
+      "partIds": ["part-objection-01"]
+    },
+    {
+      "slideIndex": 3,
+      "role": "受け取る成果物を見せる",
+      "partIds": ["part-proof-01"]
+    },
+    {
+      "slideIndex": 7,
+      "role": "価格判断を数字で支える",
+      "partIds": ["part-number-01"]
+    },
+    {
+      "slideIndex": 9,
+      "role": "最後の行動を明確にする",
+      "partIds": ["part-appeal-01", "part-cta-01", "part-visual-01"],
+      "visualPrompt": "小さな一歩から制作物が積み上がる流れを、明るくシンプルに見せる"
+    }
+  ]
+}

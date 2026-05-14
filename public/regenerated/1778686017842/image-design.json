@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "落差ストーリー型レイアウト。左に経歴ステップのイラストを配置し、月給12万円の公務員時代から借金500万円、Claude Code活用、初月売上4,500万円突破までの軌跡を段階的に表現。Claude Code配色（オレンジ系）で右肩上がりの変化を強調。",
+      "text": {
+        "main": "月給12万から初月4,500万へ",
+        "sub": "公務員出身・プログラミング未経験の軌跡",
+        "other": [
+          "市役所勤務→大学院中退→起業で借金500万円を背負う",
+          "アドネス入社後、Claude Codeで100個以上のシステムを構築",
+          "『案件探索ツール』で営業自動化、初月売上4,500万円を突破"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "2. 私の話：公務員からのスタート",
+    "template": "落差ストーリー",
+    "illustration": "経歴ステップ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-13T15:26:57.842Z"
+  }
+}
