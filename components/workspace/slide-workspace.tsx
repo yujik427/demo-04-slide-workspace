@@ -727,6 +727,7 @@ type NavigationState = {
 type WorkspaceV2State = {
   navigation: NavigationState;
   sections: Record<number, WorkspaceV2SectionState>;
+  briefing?: string;
 };
 
 type WorkspacePersistedState = {
@@ -786,6 +787,7 @@ export function SlideWorkspace() {
     onConfirm: (() => void) | null;
     confirmLabel?: string;
   } | null>(null);
+  const [launchingPipeline, setLaunchingPipeline] = useState(false);
   const [renamingChapterId, setRenamingChapterId] = useState<number | null>(null);
   const [renamingSubThemeId, setRenamingSubThemeId] = useState<string | null>(null);
   // 章ごとに編集中の原稿テキストを保持（state、リロードで消える）
@@ -1526,6 +1528,30 @@ export function SlideWorkspace() {
         setConfirmState(null);
       },
     });
+  }
+
+  async function handleLaunchPipeline() {
+    if (launchingPipeline) return;
+    setLaunchingPipeline(true);
+    try {
+      const res = await fetch("/api/launch-script-pipeline", { method: "POST" });
+      const data = (await res.json()) as { ok?: boolean; error?: string; cwd?: string };
+      if (!res.ok) {
+        window.alert(`起動失敗: ${data.error ?? "unknown error"}`);
+        return;
+      }
+      setConfirmState({
+        title: "ターミナルを起動しました",
+        message:
+          "別のターミナルウィンドウで Claude Code が起動し、grill-me による原稿要件の対話が始まります。対話とパイプラインが完了したら、この画面をリロードして反映を確認してください。",
+        confirmLabel: "OK",
+        onConfirm: () => setConfirmState(null),
+      });
+    } catch (e) {
+      window.alert(`起動失敗: ${e instanceof Error ? e.message : String(e)}`);
+    } finally {
+      setLaunchingPipeline(false);
+    }
   }
 
   function addChapter() {
@@ -2333,10 +2359,31 @@ export function SlideWorkspace() {
             <h2 className="text-[15px] leading-tight tracking-tight font-bold truncate">
               {headerTitle}
             </h2>
-            <p className="mt-0.5 text-[11px] text-slate-500">
-              全体 {sectionTotalApproved}/{sectionTotalSlides}枚
-            </p>
+            <div className="mt-0.5 flex items-center justify-between gap-2">
+              <p className="text-[11px] text-slate-500">
+                全体 {sectionTotalApproved}/{sectionTotalSlides}枚
+              </p>
+              <button
+                type="button"
+                onClick={handleLaunchPipeline}
+                disabled={launchingPipeline}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[8px] text-[11px] font-bold text-white bg-[#0f5f7a] hover:bg-[#134a60] disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+                title="grill-me から原稿生成まで一気通貫で実行"
+              >
+                {launchingPipeline ? "起動中..." : "AIで原稿を作る"}
+              </button>
+            </div>
           </header>
+          {workspaceV2State.briefing && (
+            <div className="px-[18px] py-2.5 border-b border-slate-200/50 bg-slate-50">
+              <div className="text-[9px] font-black tracking-[0.08em] text-slate-500 mb-1">
+                案件・目的
+              </div>
+              <pre className="text-[11px] leading-[1.6] text-slate-600 whitespace-pre-wrap font-sans max-h-32 overflow-auto m-0">
+                {workspaceV2State.briefing}
+              </pre>
+            </div>
+          )}
           <div className="px-3.5 py-3 overflow-auto flex-1">
             {currentSubTheme ? (
               <div className="grid gap-1">
