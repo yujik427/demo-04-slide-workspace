@@ -620,25 +620,20 @@ function computeNextChapterId(navigation: NavigationState): number {
 function computeSectionProgress(
   scriptText: string,
   paragraphSettings: ParagraphSlideSetting[] | undefined,
-  generatedSlides: GeneratedSlide[] | undefined
+  _generatedSlides: GeneratedSlide[] | undefined
 ): { approved: number; total: number } {
+  // 採用判定は approvedImagePath を信頼源にする。
+  // generatedSlides の状態（履歴復元・再生成で消えたか等）に左右されない。
+  // 「採用フラグが立っている = 採用済み」というシンプルな約束に統一。
   const blocks = parseScript(scriptText);
   const total = blocks.length;
-  if (total === 0 || !paragraphSettings || !generatedSlides) {
+  if (total === 0 || !paragraphSettings) {
     return { approved: 0, total };
   }
-
   let approved = 0;
   for (let i = 0; i < total; i += 1) {
     const setting = paragraphSettings[i];
-    if (!setting || !setting.approvedImagePath) continue;
-    const matched = generatedSlides.find(
-      (slide) =>
-        slide.paragraphId === setting.paragraphId &&
-        slide.status === "done" &&
-        slide.imagePath === setting.approvedImagePath
-    );
-    if (matched) approved += 1;
+    if (setting && setting.approvedImagePath) approved += 1;
   }
   return { approved, total };
 }
@@ -1924,29 +1919,39 @@ export function SlideWorkspace() {
       [sectionId]: sourceScriptText,
     }));
     setSelectedGeneratedSlideForSection(sectionId, 1);
-    // 全段落再生成では各段落の採用フラグをまとめてクリア
-    setWorkspaceV2State((prev) => {
-      const section = prev.sections[sectionId];
-      if (!section) return prev;
-      const paragraphs = section.paragraphs.map((setting) =>
-        setting.approvedImagePath !== null
-          ? { ...setting, approvedImagePath: null }
-          : setting
-      );
-      return {
-        ...prev,
-        sections: {
-          ...prev.sections,
-          [sectionId]: { ...section, paragraphs },
-        },
-      };
-    });
 
-    const nextSlides = createPendingSlides(scriptBlocks, currentParagraphSettings);
+    // 採用済みスライド (= ロック対象) を特定する。
+    // ロック対象は再生成で上書きせず、採用フラグも保持する。
+    const lockedSlidesByParagraphId = new Map<string, GeneratedSlide>();
+    {
+      const existingSlides = generatedSlidesBySection[sectionId] ?? [];
+      const currentSettings = workspaceV2StateRef.current.sections[sectionId]?.paragraphs ?? [];
+      for (const slide of existingSlides) {
+        if (!slide.paragraphId || slide.status !== "done" || !slide.imagePath) continue;
+        const setting = currentSettings.find((s) => s.paragraphId === slide.paragraphId);
+        if (setting && setting.approvedImagePath === slide.imagePath) {
+          lockedSlidesByParagraphId.set(slide.paragraphId, slide);
+        }
+      }
+    }
+
+    const nextSlides = createPendingSlides(scriptBlocks, currentParagraphSettings).map(
+      (slide) => {
+        if (slide.paragraphId && lockedSlidesByParagraphId.has(slide.paragraphId)) {
+          // ロック済みは現状の採用済みスライドをそのまま残す
+          return { ...lockedSlidesByParagraphId.get(slide.paragraphId)!, num: slide.num };
+        }
+        return slide;
+      }
+    );
     let completedSlides = nextSlides;
     setGeneratedSlidesBySection((prev) => ({ ...prev, [sectionId]: nextSlides }));
 
     for (const slide of nextSlides) {
+      // ロック済みスライドは再生成対象から外す
+      if (slide.paragraphId && lockedSlidesByParagraphId.has(slide.paragraphId)) {
+        continue;
+      }
       const setting = currentParagraphSettings[slide.num - 1];
       const templateForSlide = getTemplateById(setting?.templateId ?? DEFAULT_TEMPLATE_ID);
       const illustrationForSlide = getIllustrationById(
@@ -2057,6 +2062,18 @@ export function SlideWorkspace() {
     const targetSlide = previewSlides.find((slide) => slide.num === slideNum);
     if (!targetSlide) return;
     const setting = currentParagraphSettings[slideNum - 1];
+
+    // ロック判定: 採用済みスライドは再生成しない
+    if (
+      setting?.approvedImagePath &&
+      targetSlide.imagePath === setting.approvedImagePath
+    ) {
+      window.alert(
+        "このスライドは採用済みのためロックされています。\n再生成するには、まず「採用解除」を押してください。"
+      );
+      return;
+    }
+
     const templateForSlide = getTemplateById(setting?.templateId ?? DEFAULT_TEMPLATE_ID);
     const illustrationForSlide = getIllustrationById(
       setting?.illustrationId ?? DEFAULT_ILLUSTRATION_ID
@@ -2145,6 +2162,49 @@ export function SlideWorkspace() {
     setGeneratingSections((prev) => ({ ...prev, [sectionId]: false }));
   }
 
+  // 履歴復元時、採用済みスライド（approvedImagePath が指すもの）はそのまま維持する。
+  // - 履歴に同 paragraphId の slide があれば、採用済みの slide で置換する
+  // - 履歴に含まれない採用済み paragraphId は、採用済み slide をそのまま追加する
+  // これにより「履歴を切り替えても、過去に採用したスライドは必ず残る」を担保する。
+  function mergeWithApprovedSlides(
+    historySlides: GeneratedSlide[],
+    sectionId: number
+  ): GeneratedSlide[] {
+    const settings = workspaceV2StateRef.current.sections[sectionId]?.paragraphs ?? [];
+    const currentSlides = generatedSlidesBySection[sectionId] ?? [];
+    const approvedByParagraphId = new Map<string, GeneratedSlide>();
+    for (const slide of currentSlides) {
+      if (!slide.paragraphId || slide.status !== "done" || !slide.imagePath) continue;
+      const setting = settings.find((s) => s.paragraphId === slide.paragraphId);
+      if (setting && setting.approvedImagePath === slide.imagePath) {
+        approvedByParagraphId.set(slide.paragraphId, slide);
+      }
+    }
+    if (approvedByParagraphId.size === 0) return historySlides;
+
+    // 履歴の slide を走査して、同 paragraphId に採用済みがあれば置換
+    const replaced = historySlides.map((slide) => {
+      if (!slide.paragraphId) return slide;
+      const approved = approvedByParagraphId.get(slide.paragraphId);
+      return approved ? { ...approved, num: slide.num } : slide;
+    });
+
+    // 履歴に含まれていない採用済み paragraphId を追加
+    const historyParagraphIds = new Set(
+      historySlides.map((s) => s.paragraphId).filter((id): id is string => !!id)
+    );
+    const missingApproved: GeneratedSlide[] = [];
+    approvedByParagraphId.forEach((slide, paragraphId) => {
+      if (!historyParagraphIds.has(paragraphId)) {
+        missingApproved.push(slide);
+      }
+    });
+
+    if (missingApproved.length === 0) return replaced;
+    // num 昇順に並べて返す（previewSlides 側で再 merge されるので最終位置はそちらで決まる）
+    return [...replaced, ...missingApproved].sort((a, b) => a.num - b.num);
+  }
+
   function restoreHistory(history: GenerationHistory, sourceLabel: string) {
     const sectionId = activeSection;
     if (!latestGenerationSnapshot && !currentGenerationSourceLabel && generatedSlides.length > 0) {
@@ -2161,7 +2221,8 @@ export function SlideWorkspace() {
         },
       }));
     }
-    setGeneratedSlidesBySection((prev) => ({ ...prev, [sectionId]: history.slides }));
+    const mergedSlides = mergeWithApprovedSlides(history.slides, sectionId);
+    setGeneratedSlidesBySection((prev) => ({ ...prev, [sectionId]: mergedSlides }));
     setActiveTemplate(history.template);
     setActiveIllustration(history.illustration);
     setColorTheme(history.colorTheme);
@@ -2173,16 +2234,17 @@ export function SlideWorkspace() {
       ...prev,
       [sectionId]: sourceLabel,
     }));
-    setSelectedGeneratedSlideForSection(sectionId, history.slides[0]?.num ?? 1);
+    setSelectedGeneratedSlideForSection(sectionId, mergedSlides[0]?.num ?? 1);
     setHistoryOpen(false);
   }
 
   function restoreLatestGeneration() {
     if (!latestGenerationSnapshot) return;
     const sectionId = activeSection;
+    const mergedSlides = mergeWithApprovedSlides(latestGenerationSnapshot.slides, sectionId);
     setGeneratedSlidesBySection((prev) => ({
       ...prev,
-      [sectionId]: latestGenerationSnapshot.slides,
+      [sectionId]: mergedSlides,
     }));
     setActiveTemplate(latestGenerationSnapshot.template);
     setActiveIllustration(latestGenerationSnapshot.illustration);
@@ -2192,7 +2254,7 @@ export function SlideWorkspace() {
       [sectionId]: latestGenerationSnapshot.scriptText,
     }));
     setCurrentGenerationSourceLabelBySection((prev) => ({ ...prev, [sectionId]: null }));
-    setSelectedGeneratedSlideForSection(sectionId, latestGenerationSnapshot.slides[0]?.num ?? 1);
+    setSelectedGeneratedSlideForSection(sectionId, mergedSlides[0]?.num ?? 1);
     setLatestGenerationSnapshotBySection((prev) => ({ ...prev, [sectionId]: null }));
     setHistoryOpen(false);
   }
@@ -2879,10 +2941,30 @@ export function SlideWorkspace() {
                       key={slide.num}
                       type="button"
                       onClick={() => jumpToParagraph(slide.num)}
-                      aria-label={`スライド${slide.num}を選択${isApproved ? "（採用済み）" : ""}`}
-                      className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-[12px] font-black transition-colors ${classes}`}
+                      aria-label={`スライド${slide.num}を選択${isApproved ? "（採用済み・ロック中）" : ""}`}
+                      className={`relative inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-[12px] font-black transition-colors ${classes}`}
                     >
                       {slide.num}
+                      {isApproved && (
+                        <span
+                          className="absolute -right-1 -top-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-emerald-600 text-white shadow"
+                          aria-hidden="true"
+                          title="採用済み・ロック中"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            className="h-2.5 w-2.5"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 1a4 4 0 0 0-4 4v3H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-1V5a4 4 0 0 0-4-4Zm2 7V5a2 2 0 1 0-4 0v3h4Z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </span>
+                      )}
                     </button>
                   );
                 })}
@@ -2931,7 +3013,20 @@ export function SlideWorkspace() {
                     {selectedParagraphSetting?.approvedImagePath ===
                       displaySelectedSlide.imagePath && (
                       <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-[10px] font-black text-white shadow-md">
-                        ✓ 採用済み
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          className="h-3 w-3"
+                          aria-hidden="true"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 1a4 4 0 0 0-4 4v3H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-1V5a4 4 0 0 0-4-4Zm2 7V5a2 2 0 1 0-4 0v3h4Z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        採用済み（ロック中）
                       </span>
                     )}
                   </>
