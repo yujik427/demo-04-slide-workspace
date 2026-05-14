@@ -3,7 +3,6 @@
 import { useRef, useState, type KeyboardEvent } from "react";
 import salesDeckJson from "@/data/sales-deck.json";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 
 type Theme = "lecture" | "bootcamp";
 type ContentTheme = "lecture" | "bootcamp";
@@ -83,13 +82,6 @@ function parseScript(
     .filter((b) => b.text.length > 0);
 }
 
-function estimateScriptRows(text: string) {
-  const approxCharsPerLine = 34;
-  return text.split("\n").reduce((rows, line) => {
-    return rows + Math.max(1, Math.ceil(line.length / approxCharsPerLine));
-  }, 0);
-}
-
 // イラスト候補
 const ILLUSTRATION_OPTIONS = [
   { id: "step", label: "経歴ステップ" },
@@ -149,6 +141,7 @@ export function SlideWorkspace() {
   const [editedScripts, setEditedScripts] = useState<Record<number, string>>({});
   const undoStackRef = useRef<Record<number, string[]>>({});
   const redoStackRef = useRef<Record<number, string[]>>({});
+  const paragraphRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
   const currentSection = SALES_SECTIONS.find((s) => s.id === activeSection)!;
   const activeSlide = salesDeck.slides.find((s) => s.index === currentSection.slideIndex)!;
@@ -217,10 +210,83 @@ export function SlideWorkspace() {
     }));
   }
 
-  function updateScriptBlock(blockIndex: number, nextText: string) {
+  function updateScriptParagraph(blockIndex: number, nextText: string) {
     const blocks = currentScript.map((block) => block.text);
     blocks[blockIndex] = nextText;
     commitScriptText(blocks.join("\n\n"));
+  }
+
+  function getCaretOffsetWithin(element: HTMLElement) {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return 0;
+    const range = selection.getRangeAt(0);
+    const preCaretRange = range.cloneRange();
+    preCaretRange.selectNodeContents(element);
+    preCaretRange.setEnd(range.endContainer, range.endOffset);
+    return preCaretRange.toString().length;
+  }
+
+  function focusParagraph(blockNum: number, cursorOffset: number) {
+    window.setTimeout(() => {
+      const target = paragraphRefs.current[blockNum];
+      if (!target) return;
+      target.focus();
+
+      const walker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT);
+      let remaining = cursorOffset;
+      let textNode = walker.nextNode();
+      while (textNode) {
+        const length = textNode.textContent?.length ?? 0;
+        if (remaining <= length) {
+          const range = document.createRange();
+          range.setStart(textNode, remaining);
+          range.collapse(true);
+          const selection = window.getSelection();
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+          return;
+        }
+        remaining -= length;
+        textNode = walker.nextNode();
+      }
+    }, 0);
+  }
+
+  function splitParagraphAtCaret(blockIndex: number, element: HTMLElement) {
+    const text = element.innerText;
+    const caretOffset = getCaretOffsetWithin(element);
+    const blocks = currentScript.map((block) => block.text);
+    blocks[blockIndex] = text.slice(0, caretOffset);
+    blocks.splice(blockIndex + 1, 0, text.slice(caretOffset));
+    commitScriptText(blocks.join("\n\n"));
+    focusParagraph(blockIndex + 2, 0);
+  }
+
+  function mergeParagraphWithPrevious(blockIndex: number) {
+    if (blockIndex <= 0) return;
+    const blocks = currentScript.map((block) => block.text);
+    const previousLength = blocks[blockIndex - 1].length;
+    blocks[blockIndex - 1] = `${blocks[blockIndex - 1]}${blocks[blockIndex]}`;
+    blocks.splice(blockIndex, 1);
+    commitScriptText(blocks.join("\n\n"));
+    focusParagraph(blockIndex, previousLength);
+  }
+
+  function handleParagraphKeyDown(
+    event: KeyboardEvent<HTMLDivElement>,
+    blockIndex: number
+  ) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      splitParagraphAtCaret(blockIndex, event.currentTarget);
+      return;
+    }
+
+    if (event.key !== "Backspace") return;
+    const selection = window.getSelection();
+    if (!selection || !selection.isCollapsed || selection.anchorOffset !== 0) return;
+    event.preventDefault();
+    mergeParagraphWithPrevious(blockIndex);
   }
 
   function resetCurrentScript() {
@@ -449,7 +515,7 @@ export function SlideWorkspace() {
                 {currentScript.map((block, idx) => (
                   <div
                     key={block.num}
-                    className="grid scroll-mt-6 grid-cols-[44px_1fr_44px] items-start gap-4 pb-[22px] last:pb-0"
+                    className="grid grid-cols-[44px_minmax(0,1fr)_44px] items-start gap-4 pb-[22px] last:pb-0"
                   >
                     <div className="relative flex justify-center">
                       <span className="relative z-10 inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-300 bg-slate-50 text-[12px] font-black leading-none text-slate-600">
@@ -459,13 +525,21 @@ export function SlideWorkspace() {
                         <span className="absolute left-1/2 top-[34px] h-[calc(100%+20px)] w-px -translate-x-1/2 bg-slate-200" />
                       )}
                     </div>
-                    <Textarea
-                      value={block.text}
-                      onChange={(e) => updateScriptBlock(idx, e.target.value)}
+                    <div
+                      ref={(node) => {
+                        paragraphRefs.current[block.num] = node;
+                      }}
+                      contentEditable
+                      suppressContentEditableWarning
                       spellCheck={false}
-                      rows={Math.max(2, estimateScriptRows(block.text))}
-                      className="min-h-0 resize-none overflow-hidden border-0 bg-transparent p-0 text-[14px] font-normal leading-[1.85] text-slate-900 shadow-none ring-offset-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-slate-300"
-                    />
+                      onBlur={(event) =>
+                        updateScriptParagraph(idx, event.currentTarget.innerText)
+                      }
+                      onKeyDown={(event) => handleParagraphKeyDown(event, idx)}
+                      className="min-h-[26px] whitespace-pre-wrap break-words text-[14px] font-normal leading-[1.85] text-slate-900 outline-none"
+                    >
+                      {block.text}
+                    </div>
                     <div className="pt-1 text-right text-[11px] font-semibold text-slate-300">
                       {block.count}字
                     </div>
