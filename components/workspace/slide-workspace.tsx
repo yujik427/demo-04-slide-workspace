@@ -6,7 +6,6 @@ import {
   useRef,
   useState,
   type FormEvent,
-  type KeyboardEvent,
 } from "react";
 
 type Theme = "lecture" | "bootcamp";
@@ -113,6 +112,7 @@ type GeneratedSlide = {
   count: number;
   status: GeneratedSlideStatus;
   imagePath?: string;
+  error?: string;
   title: string;
 };
 
@@ -150,8 +150,6 @@ export function SlideWorkspace() {
   // 章ごとに編集中の原稿テキストを保持（state、リロードで消える）
   const [editedScripts, setEditedScripts] = useState<Record<number, string>>({});
   const draftScriptsRef = useRef<Record<number, string>>({});
-  const undoStackRef = useRef<Record<number, string[]>>({});
-  const redoStackRef = useRef<Record<number, string[]>>({});
   const editorRef = useRef<HTMLDivElement | null>(null);
   const measurementRef = useRef<HTMLDivElement | null>(null);
   const [paragraphMetrics, setParagraphMetrics] = useState<ParagraphMetric[]>([]);
@@ -198,12 +196,6 @@ export function SlideWorkspace() {
   }, [activeSection]);
 
   useEffect(() => {
-    if (editorRef.current) {
-      editorRef.current.innerText = currentScriptText;
-    }
-  }, [activeSection]);
-
-  useEffect(() => {
     const editor = editorRef.current;
     if (!editor || document.activeElement === editor) return;
     if (editor.innerText !== currentScriptText) {
@@ -245,12 +237,30 @@ export function SlideWorkspace() {
     }));
   }
 
-  function getMockSlideImagePath(slideNum: number) {
-    const fallbackIndex = ((slideNum - 1) % 10) + 1;
-    return `/slides/v7/slide-${fallbackIndex}.png`;
+  async function generateSlideImage(slide: GeneratedSlide) {
+    const response = await fetch("/api/regenerate-slide", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sectionTitle: `${currentSection.title} / ${slide.num}枚目`,
+        script: slide.sourceText,
+        template: activeTemplate,
+        illustration: illustrationLabel,
+        colorTheme,
+      }),
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error ?? `HTTP ${response.status}`);
+    }
+    if (!result.imagePath) {
+      throw new Error("生成画像のパスが返ってきませんでした");
+    }
+    return result.imagePath as string;
   }
 
-  async function handleMockGenerateSection() {
+  async function handleGenerateSection() {
     if (currentScript.length === 0) return;
     const sourceScriptText = currentScriptText;
     if (
@@ -289,80 +299,75 @@ export function SlideWorkspace() {
       setSelectedGeneratedSlide(slide.num);
       setGeneratedSlides((prev) =>
         prev.map((item) =>
-          item.num === slide.num ? { ...item, status: "generating" } : item
-        )
-      );
-
-      await new Promise((resolve) => window.setTimeout(resolve, 450));
-
-      setGeneratedSlides((prev) =>
-        prev.map((item) =>
           item.num === slide.num
-            ? { ...item, status: "done", imagePath: getMockSlideImagePath(item.num) }
+            ? { ...item, status: "generating", error: undefined }
             : item
         )
       );
+
+      try {
+        const imagePath = await generateSlideImage(slide);
+        setGeneratedSlides((prev) =>
+          prev.map((item) =>
+            item.num === slide.num
+              ? { ...item, status: "done", imagePath, error: undefined }
+              : item
+          )
+        );
+      } catch (error) {
+        setGeneratedSlides((prev) =>
+          prev.map((item) =>
+            item.num === slide.num
+              ? {
+                  ...item,
+                  status: "failed",
+                  imagePath: undefined,
+                  error: error instanceof Error ? error.message : "生成に失敗しました",
+                }
+              : item
+          )
+        );
+      }
     }
 
-    setIsMockGenerating(false);
-  }
-
-  async function handleMockGenerateWithFailure() {
-    if (currentScript.length === 0) return;
-    const sourceScriptText = currentScriptText;
-    setLatestGenerationSnapshot(null);
-    setCurrentGenerationSourceLabel(null);
-    setIsMockGenerating(true);
-    setCurrentGenerationScriptText(sourceScriptText);
-    setSelectedGeneratedSlide(1);
-
-    const nextSlides = createPendingSlides();
-    const failNum = Math.min(2, nextSlides.length);
-    setGeneratedSlides(nextSlides);
-
-    for (const slide of nextSlides) {
-      setSelectedGeneratedSlide(slide.num);
-      setGeneratedSlides((prev) =>
-        prev.map((item) =>
-          item.num === slide.num ? { ...item, status: "generating" } : item
-        )
-      );
-
-      await new Promise((resolve) => window.setTimeout(resolve, 450));
-
-      setGeneratedSlides((prev) =>
-        prev.map((item) => {
-          if (item.num !== slide.num) return item;
-          if (item.num === failNum) {
-            return { ...item, status: "failed", imagePath: undefined };
-          }
-          return { ...item, status: "done", imagePath: getMockSlideImagePath(item.num) };
-        })
-      );
-    }
-
-    setSelectedGeneratedSlide(failNum);
     setIsMockGenerating(false);
   }
 
   async function retryMockSlide(slideNum: number) {
+    const targetSlide = generatedSlides.find((slide) => slide.num === slideNum);
+    if (!targetSlide) return;
+
     setIsMockGenerating(true);
     setSelectedGeneratedSlide(slideNum);
     setGeneratedSlides((prev) =>
       prev.map((item) =>
-        item.num === slideNum ? { ...item, status: "generating" } : item
+        item.num === slideNum ? { ...item, status: "generating", error: undefined } : item
       )
     );
 
-    await new Promise((resolve) => window.setTimeout(resolve, 450));
-
-    setGeneratedSlides((prev) =>
-      prev.map((item) =>
-        item.num === slideNum
-          ? { ...item, status: "done", imagePath: getMockSlideImagePath(item.num) }
-          : item
-      )
-    );
+    try {
+      const imagePath = await generateSlideImage(targetSlide);
+      setGeneratedSlides((prev) =>
+        prev.map((item) =>
+          item.num === slideNum
+            ? { ...item, status: "done", imagePath, error: undefined }
+            : item
+        )
+      );
+    } catch (error) {
+      setGeneratedSlides((prev) =>
+        prev.map((item) =>
+          item.num === slideNum
+            ? {
+                ...item,
+                status: "failed",
+                imagePath: undefined,
+                error: error instanceof Error ? error.message : "生成に失敗しました",
+              }
+            : item
+        )
+      );
+    }
     setIsMockGenerating(false);
   }
 
@@ -407,24 +412,6 @@ export function SlideWorkspace() {
     return `${index + 1}つ前`;
   }
 
-  function rememberScript(previousText: string) {
-    const stack = undoStackRef.current[activeSection] ?? [];
-    if (stack.at(-1) !== previousText) {
-      undoStackRef.current[activeSection] = [...stack, previousText].slice(-100);
-    }
-    redoStackRef.current[activeSection] = [];
-  }
-
-  function commitScriptText(nextText: string) {
-    draftScriptsRef.current[activeSection] = nextText;
-    if (nextText === savedScriptText) return;
-    rememberScript(savedScriptText);
-    setEditedScripts((prev) => ({
-      ...prev,
-      [activeSection]: nextText,
-    }));
-  }
-
   function updateWholeScriptText(nextText: string) {
     draftScriptsRef.current[activeSection] = nextText;
     setEditedScripts((prev) => ({
@@ -435,51 +422,6 @@ export function SlideWorkspace() {
 
   function handleEditorInput(event: FormEvent<HTMLDivElement>) {
     updateWholeScriptText(event.currentTarget.innerText);
-  }
-
-  function undoScriptChange() {
-    const stack = undoStackRef.current[activeSection] ?? [];
-    const previousText = stack.at(-1);
-    if (previousText === undefined) return;
-    undoStackRef.current[activeSection] = stack.slice(0, -1);
-    redoStackRef.current[activeSection] = [
-      ...(redoStackRef.current[activeSection] ?? []),
-      currentScriptText,
-    ].slice(-100);
-    draftScriptsRef.current[activeSection] = previousText;
-    setEditedScripts((prev) => ({
-      ...prev,
-      [activeSection]: previousText,
-    }));
-  }
-
-  function redoScriptChange() {
-    const stack = redoStackRef.current[activeSection] ?? [];
-    const nextText = stack.at(-1);
-    if (nextText === undefined) return;
-    redoStackRef.current[activeSection] = stack.slice(0, -1);
-    undoStackRef.current[activeSection] = [
-      ...(undoStackRef.current[activeSection] ?? []),
-      currentScriptText,
-    ].slice(-100);
-    draftScriptsRef.current[activeSection] = nextText;
-    setEditedScripts((prev) => ({
-      ...prev,
-      [activeSection]: nextText,
-    }));
-  }
-
-  function handleEditorKeyDown(event: KeyboardEvent<HTMLElement>) {
-    const isModifierPressed = event.metaKey || event.ctrlKey;
-    const key = event.key.toLowerCase();
-    if (!isModifierPressed || (key !== "z" && key !== "y")) return;
-
-    event.preventDefault();
-    if (key === "y" || event.shiftKey) {
-      redoScriptChange();
-      return;
-    }
-    undoScriptChange();
   }
 
   const headerTitle =
@@ -659,7 +601,6 @@ export function SlideWorkspace() {
                     suppressContentEditableWarning
                     spellCheck={false}
                     onInput={handleEditorInput}
-                    onKeyDown={handleEditorKeyDown}
                     className="relative z-10 min-h-[520px] w-full whitespace-pre-wrap break-words text-[14px] font-normal leading-[1.85] text-slate-900 outline-none"
                     aria-disabled={isMockGenerating}
                   />
@@ -818,7 +759,7 @@ export function SlideWorkspace() {
               </p>
               <button
                 type="button"
-                onClick={handleMockGenerateSection}
+                onClick={handleGenerateSection}
                 disabled={isMockGenerating || currentScript.length === 0}
                 className={`w-full min-h-[44px] rounded-lg text-[13px] font-extrabold transition-colors ${
                   isMockGenerating
@@ -832,19 +773,6 @@ export function SlideWorkspace() {
                     ? `更新した原稿で${currentScript.length}枚再生成`
                     : `この条件で${currentScript.length}枚生成`}
               </button>
-              <button
-                type="button"
-                onClick={handleMockGenerateWithFailure}
-                disabled={isMockGenerating || currentScript.length === 0}
-                className="mt-2 w-full min-h-[34px] rounded-lg border border-dashed border-slate-300 bg-white text-[12px] font-extrabold text-slate-500 transition-colors hover:bg-slate-50 disabled:cursor-wait disabled:opacity-50"
-              >
-                失敗UIを確認する
-              </button>
-              {isMockGenerating && (
-                <p className="mt-2 text-[11px] text-slate-500 leading-[1.5]">
-                  まずはUI確認用のダミー生成です。API連携は後で接続します。
-                </p>
-              )}
               {historyOpen && (
                 <div className="mt-3 grid gap-2 border-t border-slate-100 pt-3">
                   {currentGenerationSummary && (
@@ -977,7 +905,8 @@ export function SlideWorkspace() {
                       このスライドの生成に失敗しました
                     </h3>
                     <p className="mt-2 max-w-[82%] text-[11px] leading-[1.7] text-slate-500">
-                      成功したスライドは残したまま、この1枚だけ再試行できます。
+                      {displaySelectedSlide.error ??
+                        "成功したスライドは残したまま、この1枚だけ再試行できます。"}
                     </p>
                     <button
                       type="button"
