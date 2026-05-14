@@ -14,38 +14,149 @@ type ColorTheme = "lecture" | "bootcamp";
 type ScriptBlock = { num: number; text: string; count: number };
 type ParagraphMetric = { num: number; top: number; height: number };
 
-// 販売スライドの9章立て（各章=スライド何枚）
+// CCブートキャンプ販売スライド原稿（各項目=1スライド）
 const SALES_SECTIONS = [
-  { id: 1, title: "1. 導入", slideCount: "1/1", slideIndex: 1 },
-  { id: 2, title: "2. 私の話：公務員からのスタート", slideCount: "2/2", slideIndex: 4 },
-  { id: 3, title: "3. なぜこのブートキャンプを作ったか", slideCount: "1/1", slideIndex: 2 },
-  { id: 4, title: "4. うちの会社：アドネスとみかみのこと", slideCount: "1/1", slideIndex: 4 },
-  { id: 5, title: "5. このブートキャンプで手に入ること", slideCount: "1/1", slideIndex: 5 },
-  { id: 6, title: "6. カリキュラム：7日で何をやるか", slideCount: "1/1", slideIndex: 6 },
-  { id: 7, title: "7. 価格について", slideCount: "1/1", slideIndex: 8 },
-  { id: 8, title: "8. よくある不安に先回りで答える", slideCount: "1/1", slideIndex: 9 },
-  { id: 9, title: "9. 最後に", slideCount: "1/1", slideIndex: 10 },
+  { id: 1, title: "1. 結論", slideCount: "1/1", slideIndex: 1 },
+  { id: 2, title: "2. それ、本当？", slideCount: "1/1", slideIndex: 2 },
+  { id: 3, title: "3. 未経験で本当にできるのか", slideCount: "1/1", slideIndex: 3 },
+  { id: 4, title: "4. 7日でついていけるのか", slideCount: "1/1", slideIndex: 4 },
+  { id: 5, title: "5. 元は取れるのか", slideCount: "1/1", slideIndex: 5 },
+  { id: 6, title: "6. 他のAIスクールと何が違うのか", slideCount: "1/1", slideIndex: 6 },
+  { id: 7, title: "7. おまけじゃなく、武器が手に入る", slideCount: "1/1", slideIndex: 7 },
+  { id: 8, title: "8. 価格", slideCount: "1/1", slideIndex: 8 },
+  { id: 9, title: "9. 受講の流れ", slideCount: "1/1", slideIndex: 9 },
+  { id: 10, title: "10. CTA", slideCount: "1/1", slideIndex: 10 },
 ];
 
-// 各章のデフォルト原稿（v6 script-source.md より）。1つの文字列として保持（段落は空行区切り）
+// 各スライドの講師ナレーション。1スライド=1ブロックにするため、ナレーション内は空行を入れない。
 const CHAPTER_DEFAULTS: Record<number, string> = {
-  1: `今日はですね、私たちが今やっている「本質のClaude Code 完全攻略 7dayブートキャンプ」の話をさせてください。
-私自身がプログラミング経験ゼロから始めて、何ができるようになったのか。
-それを7日間で皆さんにお渡しする、という話です。
-少しだけ私の話から始めさせてください。`,
-  2: `私、もともと高卒で市役所に入った公務員だったんですよ。
-月給は12万円でした。
-働きながら大学に通って、そのあと大学院にも進んだんですけど、半年で中退して起業したんです。
-それで借金が500万円残りました。
-
-その後、アドネスという会社に入って、人生が一変したんです。
-私、プログラミング経験ゼロだったんですよ。
-それなのに Claude Code を使い始めて、100個以上のシステムを作れるようになりました。
-
-経験ゼロから始めた身でも作れたシステムの中に、『案件探索ツール』というのがあって、営業を自動化したら初月で1,000万円の案件が取れたんです。
-同じく未経験のまま始めた人間が、法人のAIコンサルを月額50万円から200万円で複数社と契約できるようになりました。
-Claude Code を使いまくった結果、初月の売上が4,500万円を突破したんです。
-私を含めて4人のチームで達成した数字です。`,
+  1: `こんばんは。アドネス株式会社、佐藤将司です。
+今日この1時間、お時間いただきます。
+最初に、皆さんに少しだけ聞かせてください。
+毎日PC開いて、終わるまでに、似たような作業を繰り返してませんか?
+資料を作る、メールを返す、リサーチする、SNSに投稿する。
+「これ、もっと効率よくできないのかな」って、1日に何回か頭をよぎる。違いますか?
+そして、心のどこかで、こうも思ってませんか?
+「副業を始めたい。でも本業で疲れて、結局何もしないまま1週間が終わる」。
+「AIを使いこなせるようになりたい。でも、何から始めればいいか分からない」。
+「このまま今の会社で、給料も上がらないまま、10年過ごすことになるんじゃないか」。
+この3つの不安、今日この1時間で、全部にこちらから答えを出します。
+答えは、画面に書いてある通りです。
+プログラミング未経験から、7日でAIシステムが1本完成する。
+「いやいや、無理でしょ」って、たぶん今思いましたよね。
+でも、これは私が今、実際にやってることなんです。
+うちの会社では、Claude Codeで作ったシステムを100個以上、毎日動かしてます。
+私個人で、初月の売上が4,500万円。
+そして1期生で、エクセルしか触ったことがなかった方が、参加から7日後、自分の業務を自動化するシステムを1本仕上げて出てきました。
+これからの1時間で、なぜそれが可能なのか、未経験のあなたがどうやってそこに到達するのか、全部種明かししていきます。
+最後まで聞き終わった時、「自分にもできそう」じゃなくて、「自分は何を作るか」まで決まってる状態になります。`,
+  2: `ここで一旦止めます。
+今、たぶん皆さんの頭の中、こうなってますよね。
+「未経験で本当にできるの?」
+「7日って短すぎない?」
+「198,000円、本当に元取れる?」
+「他のAIスクールと、何が違うの?」
+「そもそも忙しい平日、時間取れないけど?」
+この5つ、当たり前に出てくる疑問です。
+こういう時に「大丈夫です、信じてください」って言うのは、私は嫌いなんです。
+だから、次のページから1枚ずつ、事実で答えます。
+5枚使います。1枚で1つの疑問を、潰します。`,
+  3: `1つ目。「未経験で本当にできるの?」。
+答え、できます。証拠を2つ出します。
+1つ目、1期生。
+プログラミングを一度もやったことがない方が、7日でシステムを1本完成させて出てきました。これは、ご本人がSNSで発信してます。
+2つ目、私自身。
+何度も言いますが、私はもとは公務員で、月給12万円、プログラミングは一切やったことがありませんでした。
+そこからClaude Codeを始めて、今までに100個以上のシステムを構築してます。
+なぜそれが可能か。理由はシンプルです。
+Claude Codeは、日本語で「こういうもの作って」って話しかけるだけで動くからです。
+コードを書きません。読みません。覚える必要も、ありません。
+「AIに業務を依頼する」感覚です。これなら、未経験でも、初日からアウトプットが出ます。`,
+  4: `2つ目の疑問、「7日でついていける?」。
+ついでに、5つ目の「忙しくて時間ない」にも、ここで一緒に答えます。
+実はこのブートキャンプ、「7日間だけ集中」ではないんです。3段階で支える構造にしてます。
+第1段階、予習期間。
+購入したその日から、講義動画と「アクションマップ」を、自分のペースで進められます。1日30分でOK。コミュニティで質問し放題なので、つまずいたら、すぐ聞けます。
+第2段階、ブートキャンプ本番。
+月・水・金・土の夜21時から、2時間ずつ。仕事終わりに参加できる時間にしてます。全4回、合計8時間。
+第3段階、補講期間。
+本番が終わった後、もう1ヶ月、コミュニティに残れます。作ったものへのフィードバックも、ここでもらえます。
+つまり、「7日」だけを切り取ると短く見えますけど、実際には予習から補講まで、1ヶ月以上、伴走する構造です。
+夜2時間 × 4回、これさえ確保できれば、未経験でも、ついていけます。`,
+  5: `3つ目。「198,000円、本当に元は取れるの?」。
+ここ、たぶん一番気になるところですよね。
+結論から言います。月10万円の案件を、2件取れば、それで全額回収です。
+計算します。
+受講料が198,000円。Claude Codeの月額が約3,000円。
+月10万円の案件を2件取った時点で、20万円。受講料と、1ヶ月分の月額、もう超えてます。
+「でも、案件って簡単に取れるの?」って思いますよね。
+ここで、1個データを見てください。
+Claude Codeを仕事で使いこなしてる日本人、推定で0.1%未満です。
+何が言いたいかというと、今、市場の供給が圧倒的に足りてない、ということです。
+案件は、今、明らかに足りてないんです。
+私自身、Claude Codeで作った案件探索システムで、営業の初月に1,000万円の案件を1本取りました。
+これ、特殊なケースじゃないんです。Claude Codeを使えるだけで、市場での値段が一段上がるから、起きるんです。`,
+  6: `4つ目。「他のAIスクールと、何が違うの?」。
+正直に言います。今、世の中にAIスクールはたくさんあります。
+そして、教えてる人の多くは、「AIを教える人」であって、「AIで稼いでる人」ではないんです。
+私は違います。
+私はもとは公務員、月給12万円、プログラミング経験ゼロ。
+そこからClaude Codeを始めて、100個以上のシステムを構築して、Claude Codeを使い倒した結果、4人体制で初月売上4,500万円を達成しました。
+つまり、皆さんがこれから学ぶ内容を、私は今、毎日仕事で使って、結果を出し続けてます。
+「AIで稼ぐ方法」を、AIで現役で稼いでる人間が教える。
+これが、他のAIスクールとの一番の違いです。
+机上の空論を聞きに来てるんじゃないんです。今、動いてる現場の話を、そのまま持って帰ってもらいます。`,
+  7: `ここまで、5つの疑問に答えてきました。
+ここから、お渡しするものの中身をお話します。
+ブートキャンプの講義と、本番の全4回。これが本体です。
+ただし、それだけじゃありません。
+2期生限定の特典として、アドネスが社内で実際に毎日使ってる12種のAIシステムを、そのままお渡しします。
+中身、少しだけ紹介します。
+・スライド自動生成、月額換算で40万円相当
+・PPTX自動作成、20万円相当
+・システム開発アシスタント、20万円相当
+・LP制作、SNS自動投稿、案件探索、SEO記事生成 …まだあります
+全部合わせて、1,736,000円相当です。
+これ、動画を見て学んで終わり、じゃないんです。
+学んだ翌日から、実務で使える武器が、12個、手元に揃います。
+開いて話しかけるだけで、動きます。`,
+  8: `ここで、価格を、お伝えします。
+受講料は、198,000円(税抜)。
+支払い方法は、クレジットカード、銀行振込、分割払いから選べます。
+銀行振込で一括なら、5,000円引きです。
+分割なら、月々約7,532円。
+これを1日あたりに直すと、約251円です。
+コンビニコーヒー1杯、ちょっといいパン1個、それくらいの金額です。
+そして、さっき話したことを、もう一度思い出してください。
+月10万円の案件を1件取った瞬間、半年分の月額を、もう超えます。
+このセミナーを最後まで聞いてくださってる時点で、皆さんは、自分の時間を投資して、動き始めてる方です。
+あとは、決めるかどうか、それだけです。`,
+  9: `「申し込んだあと、どうなるの?」
+ここを、ご説明します。
+ステップ1、購入。
+クレジットカード、銀行振込、分割、どれでもOKです。
+ステップ2、予習期間。
+購入したその瞬間から、講義動画とアクションマップに手をつけられます。
+コミュニティに参加して、わからないことはすぐ質問してください。
+ステップ3、ブートキャンプ本番。
+月・水・金・土の夜21時から、全4回、皆で集まって手を動かします。
+私もリアルタイムで参加します。つまずいたら、その場で解消します。
+ステップ4、補講期間。
+本番が終わった後、1ヶ月、コミュニティに残って質問し放題です。
+特別な準備は要りません。PCとネット環境、それだけです。
+申し込んだその日から、もう動き始められます。`,
+  10: `最後に、お伝えします。
+今、Claude Codeを仕事で使いこなしてる日本人は、0.1%未満。
+これが意味するのは、今、参加するかしないかで、来年の自分が立ってる場所が、まったく違う景色になる、ということです。
+このセミナーを最後まで聞いてくれてる時点で、皆さんはもう、その0.1%側に入る準備ができてる方です。
+あとは、決めるだけです。
+7日後、未経験のあなたが、自分の手で動かせるAIシステムを1本、持ってる状態に変わります。
+これは、私が、確実にお約束します。
+申し込みは、画面に出てるボタンから。
+迷うところがあれば、LINEで個別相談もできます。私が直接お答えします。
+募集枠には、限りがあります。
+皆さんの参加、お待ちしてます。
+本日は、ありがとうございました。`,
 };
 
 // 空行（連続改行）で段落分割し、文字数をカウントする
@@ -105,6 +216,7 @@ const THEMES: Record<Theme, { bg: string; text: string; accent: string; label: s
 };
 
 type GeneratedSlideStatus = "idle" | "generating" | "done" | "failed";
+type DraftSaveStatus = "loading" | "saved" | "saving" | "error";
 
 type GeneratedSlide = {
   num: number;
@@ -147,8 +259,10 @@ export function SlideWorkspace() {
     useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [isMockGenerating, setIsMockGenerating] = useState(false);
+  const [draftSaveStatus, setDraftSaveStatus] = useState<DraftSaveStatus>("loading");
   // 章ごとに編集中の原稿テキストを保持（state、リロードで消える）
   const [editedScripts, setEditedScripts] = useState<Record<number, string>>({});
+  const hasLoadedDraftRef = useRef(false);
   const draftScriptsRef = useRef<Record<number, string>>({});
   const editorRef = useRef<HTMLDivElement | null>(null);
   const measurementRef = useRef<HTMLDivElement | null>(null);
@@ -194,6 +308,61 @@ export function SlideWorkspace() {
   useEffect(() => {
     setSelectedGeneratedSlide(1);
   }, [activeSection]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadDraft() {
+      try {
+        const response = await fetch("/api/script-draft");
+        const result = await response.json();
+        if (!isMounted) return;
+
+        const scripts = Object.fromEntries(
+          Object.entries(result.scripts ?? {}).map(([key, value]) => [
+            Number(key),
+            String(value),
+          ])
+        ) as Record<number, string>;
+
+        if (Object.keys(scripts).length > 0) {
+          draftScriptsRef.current = scripts;
+          setEditedScripts(scripts);
+        }
+        setDraftSaveStatus("saved");
+      } catch {
+        if (isMounted) setDraftSaveStatus("error");
+      } finally {
+        hasLoadedDraftRef.current = true;
+      }
+    }
+
+    loadDraft();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedDraftRef.current) return;
+
+    setDraftSaveStatus("saving");
+    const timeoutId = window.setTimeout(async () => {
+      try {
+        const response = await fetch("/api/script-draft", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ scripts: editedScripts }),
+        });
+        if (!response.ok) throw new Error("Failed to save draft");
+        setDraftSaveStatus("saved");
+      } catch {
+        setDraftSaveStatus("error");
+      }
+    }, 1000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [editedScripts]);
 
   useEffect(() => {
     const editor = editorRef.current;
@@ -639,9 +808,20 @@ export function SlideWorkspace() {
             {/* 原稿を箱で囲わず、状態だけを下端に控えめに出す */}
             <div className="flex items-center justify-between border-t border-slate-200/60 bg-white px-8 py-3 text-[11px] text-slate-400">
               <span>全{currentScript.length}段落</span>
-              <span>
-                総文字数 {currentScript.reduce((s, b) => s + b.count, 0)}字
-              </span>
+              <div className="flex items-center gap-3">
+                <span>
+                  {draftSaveStatus === "loading"
+                    ? "下書き確認中"
+                    : draftSaveStatus === "saving"
+                      ? "自動保存中..."
+                      : draftSaveStatus === "error"
+                        ? "自動保存エラー"
+                        : "自動保存済み"}
+                </span>
+                <span>
+                  総文字数 {currentScript.reduce((s, b) => s + b.count, 0)}字
+                </span>
+              </div>
             </div>
           </div>
         </article>
