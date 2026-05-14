@@ -1162,6 +1162,83 @@ export function SlideWorkspace() {
     }));
   }
 
+  const [exportStatus, setExportStatus] = useState<"idle" | "exporting">("idle");
+
+  async function downloadApprovedSlides() {
+    const slides: Array<{
+      chapterNum: number;
+      chapterTitle: string;
+      slideNum: number;
+      imagePath: string;
+    }> = [];
+
+    for (const section of SALES_SECTIONS) {
+      const scriptText =
+        editedScripts[section.id] ?? CHAPTER_DEFAULTS[section.id] ?? CHAPTER_DEFAULTS[2];
+      const blocks = parseScript(scriptText);
+      const paragraphSettings = workspaceV2State.sections[section.id]?.paragraphs ?? [];
+      const savedSlides = generatedSlidesBySection[section.id] ?? [];
+      for (let i = 0; i < blocks.length; i += 1) {
+        const setting = paragraphSettings[i];
+        if (!setting || !setting.approvedImagePath) continue;
+        const matched = savedSlides.find(
+          (slide) =>
+            slide.paragraphId === setting.paragraphId &&
+            slide.status === "done" &&
+            slide.imagePath === setting.approvedImagePath
+        );
+        if (!matched || !matched.imagePath) continue;
+        slides.push({
+          chapterNum: section.id,
+          chapterTitle: section.title,
+          slideNum: i + 1,
+          imagePath: matched.imagePath,
+        });
+      }
+    }
+
+    if (slides.length === 0) return;
+
+    const datePart = (() => {
+      const d = new Date();
+      const pad = (n: number) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(
+        d.getHours()
+      )}${pad(d.getMinutes())}`;
+    })();
+    const zipName = `${headerTitle}_${datePart}`;
+
+    setExportStatus("exporting");
+    try {
+      const response = await fetch("/api/export-approved", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ zipName, slides }),
+      });
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        throw new Error(result.error ?? `HTTP ${response.status}`);
+      }
+      const blob = await response.blob();
+      const objectUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = `${zipName}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.setTimeout(() => window.URL.revokeObjectURL(objectUrl), 0);
+    } catch (error) {
+      window.alert(
+        error instanceof Error
+          ? `書き出しに失敗しました: ${error.message}`
+          : "書き出しに失敗しました"
+      );
+    } finally {
+      setExportStatus("idle");
+    }
+  }
+
   function toggleApprovedForSelected() {
     const setting = selectedParagraphSetting;
     if (!setting) return;
@@ -2362,6 +2439,31 @@ export function SlideWorkspace() {
                     ? "（未採用）"
                     : ""}
               </p>
+              {(() => {
+                const remaining = Math.max(0, sectionTotalSlides - sectionTotalApproved);
+                const canExport =
+                  sectionTotalSlides > 0 && remaining === 0 && exportStatus !== "exporting";
+                return (
+                  <div className="mt-4 border-t border-slate-100 pt-3">
+                    <button
+                      type="button"
+                      onClick={downloadApprovedSlides}
+                      disabled={!canExport}
+                      className={`w-full min-h-[44px] rounded-lg text-[13px] font-extrabold transition-colors ${
+                        canExport
+                          ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                          : "bg-slate-200 text-slate-400 cursor-not-allowed"
+                      }`}
+                    >
+                      {exportStatus === "exporting"
+                        ? "ZIPを書き出し中..."
+                        : remaining === 0 && sectionTotalSlides > 0
+                          ? `採用済み${sectionTotalApproved}枚をZIPダウンロード`
+                          : `あと${remaining}枚決定するとダウンロードできます`}
+                    </button>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </article>

@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-14T10:56:20.721Z",
+  "updatedAt": "2026-05-14T11:33:29.159Z",
   "state": {
     "sections": {
       "1": {
@@ -12,6 +12,42 @@
             "illustrationId": "team",
             "illustrationSource": "manual",
             "slideHistory": [
+              {
+                "id": 1778756328682,
+                "createdAt": "2026/5/14 19:58:48",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s1-p1-fc6wwh",
+                  "sourceText": "こんばんは。アドネス株式会社、佐藤将司です。\n今日この1時間、本質のClaud  Code完全攻略セミナーとしてお時間いただきます。",
+                  "count": 63,
+                  "status": "done",
+                  "title": "こんばんは。アドネス株式会社、佐藤将司です。",
+                  "imagePath": "/regenerated/1778756328663/slide-1.png"
+                },
+                "templateId": "T01",
+                "templateLabel": "ストーリー",
+                "illustrationId": "team",
+                "illustrationLabel": "チーム構成",
+                "colorTheme": "bootcamp"
+              },
+              {
+                "id": 1778756248344,
+                "createdAt": "2026/5/14 19:57:28",
+                "slide": {
+                  "num": 1,
+                  "paragraphId": "s1-p1-fc6wwh",
+                  "sourceText": "こんばんは。アドネス株式会社、佐藤将司です。\n今日この1時間、本質のClaud  Code完全攻略セミナーとしてお時間いただきます。",
+                  "count": 63,
+                  "status": "done",
+                  "title": "こんばんは。アドネス株式会社、佐藤将司です。",
+                  "imagePath": "/regenerated/1778756248331/slide-1.png"
+                },
+                "templateId": "T01",
+                "templateLabel": "ストーリー",
+                "illustrationId": "team",
+                "illustrationLabel": "チーム構成",
+                "colorTheme": "lecture"
+              },
               {
                 "id": 1778751849099,
                 "createdAt": "2026/5/14 18:44:09",
@@ -49,7 +85,7 @@
                 "colorTheme": "bootcamp"
               }
             ],
-            "approvedImagePath": null
+            "approvedImagePath": "/regenerated/1778756328663/slide-1.png"
           },
           {
             "paragraphId": "s1-p4-mnqms4",
