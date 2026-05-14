@@ -3,6 +3,7 @@
 import {
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
   type FormEvent,
@@ -13,6 +14,7 @@ type ContentTheme = "lecture" | "bootcamp";
 type ColorTheme = "lecture" | "bootcamp";
 type ScriptBlock = { num: number; text: string; count: number };
 type ParagraphMetric = { num: number; top: number; height: number };
+type SettingSource = "recommended" | "manual";
 
 // CCブートキャンプ販売スライド原稿（各項目=1スライド）
 const SALES_SECTIONS = [
@@ -186,6 +188,28 @@ function normalizeScriptForComparison(text: string) {
     .join("\n\n");
 }
 
+function normalizeParagraphText(text: string) {
+  return text
+    .replace(/\r\n/g, "\n")
+    .replace(/\u00a0/g, " ")
+    .split("\n")
+    .map((line) => line.trimEnd())
+    .join("\n")
+    .trim();
+}
+
+function hashText(text: string) {
+  let hash = 5381;
+  for (let i = 0; i < text.length; i += 1) {
+    hash = (hash * 33) ^ text.charCodeAt(i);
+  }
+  return (hash >>> 0).toString(36);
+}
+
+function createParagraphFingerprint(text: string) {
+  return hashText(normalizeParagraphText(text));
+}
+
 // イラスト候補
 const ILLUSTRATION_OPTIONS = [
   { id: "step", label: "経歴ステップ" },
@@ -193,11 +217,119 @@ const ILLUSTRATION_OPTIONS = [
   { id: "team", label: "チーム構成" },
 ];
 
-// テンプレート画像（17枚）
-const TEMPLATES = Array.from({ length: 17 }, (_, i) => ({
-  id: `T${String(i + 1).padStart(2, "0")}`,
-  src: `/templates/T${String(i + 1).padStart(2, "0")}.png`,
+// テンプレートカタログ。保存と生成には安定ID、UIには用途名を使う。
+const TEMPLATE_CATALOG = [
+  { id: "T01", label: "ストーリー", description: "変化やビフォーアフターを見せる" },
+  { id: "T02", label: "疑問提示", description: "読者の不安や問いを並べる" },
+  { id: "T03", label: "証拠提示", description: "実績・事例・根拠で答える" },
+  { id: "T04", label: "数字強調", description: "金額・期間・割合を大きく見せる" },
+  { id: "T05", label: "手順説明", description: "ステップや流れを整理する" },
+  { id: "T06", label: "比較", description: "他社・過去・選択肢との差を見せる" },
+  { id: "T07", label: "CTA", description: "申込・相談など次の行動を促す" },
+  ...Array.from({ length: 10 }, (_, i) => {
+    const n = i + 8;
+    const id = `T${String(n).padStart(2, "0")}`;
+    return { id, label: `汎用 ${id}`, description: "汎用レイアウト" };
+  }),
+] as const;
+
+const TEMPLATES = TEMPLATE_CATALOG.map((template) => ({
+  ...template,
+  src: `/templates/${template.id}.png`,
 }));
+
+const DEFAULT_TEMPLATE_ID = "T01";
+const DEFAULT_ILLUSTRATION_ID = "step";
+
+function getTemplateById(templateId: string) {
+  return TEMPLATES.find((template) => template.id === templateId) ?? TEMPLATES[0];
+}
+
+function getIllustrationById(illustrationId: string) {
+  return (
+    ILLUSTRATION_OPTIONS.find((illustration) => illustration.id === illustrationId) ??
+    ILLUSTRATION_OPTIONS[0]
+  );
+}
+
+function recommendSlideSettings(text: string): {
+  templateId: string;
+  illustrationId: string;
+} {
+  const normalized = normalizeParagraphText(text);
+
+  if (/申し込|参加|相談|募集|ボタン|お待ち|決めるだけ|LINE/.test(normalized)) {
+    return { templateId: "T07", illustrationId: "step" };
+  }
+  if (/価格|受講料|円|月々|分割|一括|回収|元|万円|251/.test(normalized)) {
+    return { templateId: "T04", illustrationId: "graph" };
+  }
+  if (/ステップ|流れ|第1|第2|第3|購入|予習|本番|補講/.test(normalized)) {
+    return { templateId: "T05", illustrationId: "step" };
+  }
+  if (/違い|他の|比較|スクール|ではない|私は違/.test(normalized)) {
+    return { templateId: "T06", illustrationId: "team" };
+  }
+  if (/証拠|実績|1期生|SNS|完成|構築|達成|データ|0\.1/.test(normalized)) {
+    return { templateId: "T03", illustrationId: "graph" };
+  }
+  if (/本当に|できる|短すぎ|取れる|疑問|不安|どうなる|ですか|[?？]/.test(normalized)) {
+    return { templateId: "T02", illustrationId: "team" };
+  }
+  return { templateId: DEFAULT_TEMPLATE_ID, illustrationId: DEFAULT_ILLUSTRATION_ID };
+}
+
+function createParagraphId(sectionId: number, block: ScriptBlock) {
+  return `s${sectionId}-p${block.num}-${createParagraphFingerprint(block.text)}`;
+}
+
+function reconcileParagraphSettings(
+  sectionId: number,
+  scriptBlocks: ScriptBlock[],
+  previousSettings: ParagraphSlideSetting[]
+): ParagraphSlideSetting[] {
+  const usedIndexes = new Set<number>();
+
+  return scriptBlocks.map((block, index) => {
+    const textFingerprint = createParagraphFingerprint(block.text);
+    const exactIndex = previousSettings.findIndex((setting, settingIndex) => {
+      if (usedIndexes.has(settingIndex)) return false;
+      return setting.textFingerprint === textFingerprint;
+    });
+    const fallbackIndex =
+      exactIndex >= 0
+        ? exactIndex
+        : index < previousSettings.length && !usedIndexes.has(index)
+          ? index
+          : -1;
+    const recommended = recommendSlideSettings(block.text);
+
+    if (fallbackIndex >= 0) {
+      usedIndexes.add(fallbackIndex);
+      const previous = previousSettings[fallbackIndex];
+      return {
+        ...previous,
+        textFingerprint,
+        templateId:
+          previous.templateSource === "manual" ? previous.templateId : recommended.templateId,
+        illustrationId:
+          previous.illustrationSource === "manual"
+            ? previous.illustrationId
+            : recommended.illustrationId,
+      };
+    }
+
+    return {
+      paragraphId: createParagraphId(sectionId, block),
+      textFingerprint,
+      templateId: recommended.templateId,
+      templateSource: "recommended",
+      illustrationId: recommended.illustrationId,
+      illustrationSource: "recommended",
+      slideHistory: [],
+    };
+  });
+}
 
 // 配色テーマ
 const THEMES: Record<Theme, { bg: string; text: string; accent: string; label: string }> = {
@@ -220,6 +352,7 @@ type DraftSaveStatus = "loading" | "saved" | "saving" | "error";
 
 type GeneratedSlide = {
   num: number;
+  paragraphId?: string;
   sourceText: string;
   count: number;
   status: GeneratedSlideStatus;
@@ -238,6 +371,49 @@ type GenerationHistory = {
   colorTheme: ColorTheme;
 };
 
+type SlideHistoryEntry = {
+  id: number;
+  createdAt: string;
+  slide: GeneratedSlide;
+  templateId: string;
+  templateLabel: string;
+  illustrationId: string;
+  illustrationLabel: string;
+  colorTheme: ColorTheme;
+};
+
+type ParagraphSlideSetting = {
+  paragraphId: string;
+  textFingerprint: string;
+  templateId: string;
+  templateSource: SettingSource;
+  illustrationId: string;
+  illustrationSource: SettingSource;
+  slideHistory: SlideHistoryEntry[];
+};
+
+type WorkspaceV2SectionState = {
+  paragraphs: ParagraphSlideSetting[];
+};
+
+type WorkspaceV2State = {
+  sections: Record<number, WorkspaceV2SectionState>;
+};
+
+type WorkspacePersistedState = {
+  activeSection: number;
+  contentTheme: ContentTheme;
+  colorTheme: ColorTheme;
+  activeTemplate: string;
+  activeIllustration: string;
+  selectedGeneratedSlidesBySection: Record<number, number>;
+  generatedSlidesBySection: Record<number, GeneratedSlide[]>;
+  generationHistoryBySection: Record<number, GenerationHistory[]>;
+  latestGenerationSnapshotBySection: Record<number, GenerationHistory | null>;
+  currentGenerationSourceLabelBySection: Record<number, string | null>;
+  currentGenerationScriptTextBySection: Record<number, string | null>;
+};
+
 export function SlideWorkspace() {
   // 1区で選ぶ「テーマ内容」（何の案件か）と 4区で選ぶ「配色テーマ」（どの色で出すか）は完全独立
   const [contentTheme, setContentTheme] = useState<ContentTheme>("bootcamp");
@@ -248,21 +424,34 @@ export function SlideWorkspace() {
   const [activeIllustration, setActiveIllustration] = useState("step");
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [largePreviewOpen, setLargePreviewOpen] = useState(false);
-  const [selectedGeneratedSlide, setSelectedGeneratedSlide] = useState(1);
-  const [generatedSlides, setGeneratedSlides] = useState<GeneratedSlide[]>([]);
-  const [generationHistory, setGenerationHistory] = useState<GenerationHistory[]>([]);
-  const [latestGenerationSnapshot, setLatestGenerationSnapshot] =
-    useState<GenerationHistory | null>(null);
-  const [currentGenerationSourceLabel, setCurrentGenerationSourceLabel] =
-    useState<string | null>(null);
-  const [currentGenerationScriptText, setCurrentGenerationScriptText] =
-    useState<string | null>(null);
+  const [selectedGeneratedSlidesBySection, setSelectedGeneratedSlidesBySection] =
+    useState<Record<number, number>>({});
+  const [generatedSlidesBySection, setGeneratedSlidesBySection] = useState<
+    Record<number, GeneratedSlide[]>
+  >({});
+  const [generationHistoryBySection, setGenerationHistoryBySection] = useState<
+    Record<number, GenerationHistory[]>
+  >({});
+  const [latestGenerationSnapshotBySection, setLatestGenerationSnapshotBySection] =
+    useState<Record<number, GenerationHistory | null>>({});
+  const [currentGenerationSourceLabelBySection, setCurrentGenerationSourceLabelBySection] =
+    useState<Record<number, string | null>>({});
+  const [currentGenerationScriptTextBySection, setCurrentGenerationScriptTextBySection] =
+    useState<Record<number, string | null>>({});
   const [historyOpen, setHistoryOpen] = useState(false);
-  const [isMockGenerating, setIsMockGenerating] = useState(false);
+  const [generatingSections, setGeneratingSections] = useState<Record<number, boolean>>({});
   const [draftSaveStatus, setDraftSaveStatus] = useState<DraftSaveStatus>("loading");
+  const [workspaceStateReady, setWorkspaceStateReady] = useState(false);
+  const [workspaceV2State, setWorkspaceV2State] = useState<WorkspaceV2State>({ sections: {} });
+  const [workspaceV2Ready, setWorkspaceV2Ready] = useState(false);
+  const [templateModalTargetSlide, setTemplateModalTargetSlide] = useState<number | null>(null);
   // 章ごとに編集中の原稿テキストを保持（state、リロードで消える）
   const [editedScripts, setEditedScripts] = useState<Record<number, string>>({});
   const hasLoadedDraftRef = useRef(false);
+  const hasLoadedWorkspaceStateRef = useRef(false);
+  const isRestoringWorkspaceStateRef = useRef(true);
+  const workspaceStateRef = useRef<WorkspacePersistedState | null>(null);
+  const workspaceV2StateRef = useRef<WorkspaceV2State>({ sections: {} });
   const draftScriptsRef = useRef<Record<number, string>>({});
   const editorRef = useRef<HTMLDivElement | null>(null);
   const measurementRef = useRef<HTMLDivElement | null>(null);
@@ -274,28 +463,53 @@ export function SlideWorkspace() {
     CHAPTER_DEFAULTS[activeSection] ??
     CHAPTER_DEFAULTS[2];
   const currentScriptText = draftScriptsRef.current[activeSection] ?? savedScriptText;
-  const currentScript = parseScript(currentScriptText, { keepEmpty: true });
+  const currentScript = useMemo(
+    () => parseScript(currentScriptText, { keepEmpty: true }),
+    [currentScriptText]
+  );
+  const currentParagraphSettings = reconcileParagraphSettings(
+    activeSection,
+    currentScript,
+    workspaceV2State.sections[activeSection]?.paragraphs ?? []
+  );
   const themeStyle = THEMES[theme];
+  const selectedGeneratedSlide = selectedGeneratedSlidesBySection[activeSection] ?? 1;
+  const generatedSlides = generatedSlidesBySection[activeSection] ?? [];
+  const generationHistory = generationHistoryBySection[activeSection] ?? [];
+  const latestGenerationSnapshot = latestGenerationSnapshotBySection[activeSection] ?? null;
+  const currentGenerationSourceLabel =
+    currentGenerationSourceLabelBySection[activeSection] ?? null;
+  const currentGenerationScriptText =
+    currentGenerationScriptTextBySection[activeSection] ?? null;
+  const isMockGenerating = generatingSections[activeSection] ?? false;
 
-  const illustrationLabel =
-    ILLUSTRATION_OPTIONS.find((o) => o.id === activeIllustration)?.label ?? "";
+  const selectedParagraphSetting =
+    currentParagraphSettings[selectedGeneratedSlide - 1] ?? currentParagraphSettings[0] ?? null;
+  const selectedTemplate = selectedParagraphSetting
+    ? getTemplateById(selectedParagraphSetting.templateId)
+    : getTemplateById(DEFAULT_TEMPLATE_ID);
+  const selectedIllustration = selectedParagraphSetting
+    ? getIllustrationById(selectedParagraphSetting.illustrationId)
+    : getIllustrationById(DEFAULT_ILLUSTRATION_ID);
+  const illustrationLabel = selectedIllustration.label;
+  const previewSlides = mergeGeneratedSlidesWithScript(
+    currentScript,
+    generatedSlides,
+    currentParagraphSettings
+  );
   const selectedGenerated =
-    generatedSlides.find((slide) => slide.num === selectedGeneratedSlide) ??
-    generatedSlides[0] ??
-    null;
-  const generatingSlide =
-    generatedSlides.find((slide) => slide.status === "generating") ?? null;
-  const previewSlides = generatedSlides.length > 0 ? generatedSlides : createPendingSlides();
-  const displaySelectedSlide =
-    selectedGenerated ??
     previewSlides.find((slide) => slide.num === selectedGeneratedSlide) ??
     previewSlides[0] ??
     null;
+  const generatingSlide =
+    previewSlides.find((slide) => slide.status === "generating") ?? null;
+  const displaySelectedSlide =
+    selectedGenerated ?? previewSlides[0] ?? null;
   const currentGenerationSummary =
-    generatedSlides.length > 0
+    previewSlides.some((slide) => slide.status !== "idle" || slide.imagePath || slide.error)
       ? {
-          slides: generatedSlides,
-          template: activeTemplate,
+          slides: previewSlides,
+          template: "スライド別",
           colorTheme,
         }
       : null;
@@ -304,9 +518,39 @@ export function SlideWorkspace() {
     currentGenerationScriptText !== null &&
     normalizeScriptForComparison(currentGenerationScriptText) !==
       normalizeScriptForComparison(currentScriptText);
+  const workspaceState = useMemo<WorkspacePersistedState>(
+    () => ({
+      activeSection,
+      contentTheme,
+      colorTheme,
+      activeTemplate,
+      activeIllustration,
+      selectedGeneratedSlidesBySection,
+      generatedSlidesBySection,
+      generationHistoryBySection,
+      latestGenerationSnapshotBySection,
+      currentGenerationSourceLabelBySection,
+      currentGenerationScriptTextBySection,
+    }),
+    [
+      activeSection,
+      contentTheme,
+      colorTheme,
+      activeTemplate,
+      activeIllustration,
+      selectedGeneratedSlidesBySection,
+      generatedSlidesBySection,
+      generationHistoryBySection,
+      latestGenerationSnapshotBySection,
+      currentGenerationSourceLabelBySection,
+      currentGenerationScriptTextBySection,
+    ]
+  );
 
   useEffect(() => {
-    setSelectedGeneratedSlide(1);
+    setSelectedGeneratedSlidesBySection((prev) =>
+      prev[activeSection] ? prev : { ...prev, [activeSection]: 1 }
+    );
   }, [activeSection]);
 
   useEffect(() => {
@@ -344,6 +588,162 @@ export function SlideWorkspace() {
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
+
+    function restoreSlidesBySection(
+      sections: Record<number, GeneratedSlide[]> | undefined
+    ): Record<number, GeneratedSlide[]> {
+      return Object.fromEntries(
+        Object.entries(sections ?? {}).map(([key, slides]) => [
+          Number(key),
+          (Array.isArray(slides) ? slides : []).map((slide) =>
+            slide.status === "generating"
+              ? {
+                  ...slide,
+                  status: "failed" as GeneratedSlideStatus,
+                  error: slide.error ?? "前回生成中にブラウザを閉じたため、再生成してください",
+                }
+              : slide
+          ),
+        ])
+      ) as Record<number, GeneratedSlide[]>;
+    }
+
+    async function loadWorkspaceState() {
+      try {
+        const response = await fetch("/api/workspace-state");
+        const result = await response.json();
+        if (!isMounted || !result.state) return;
+
+        const state = result.state as Partial<WorkspacePersistedState>;
+        if (
+          typeof state.activeSection === "number" &&
+          SALES_SECTIONS.some((section) => section.id === state.activeSection)
+        ) {
+          setActiveSection(state.activeSection);
+        }
+        if (state.contentTheme) setContentTheme(state.contentTheme);
+        if (state.colorTheme) setColorTheme(state.colorTheme);
+        if (state.activeTemplate) setActiveTemplate(state.activeTemplate);
+        if (state.activeIllustration) setActiveIllustration(state.activeIllustration);
+        if (state.selectedGeneratedSlidesBySection) {
+          setSelectedGeneratedSlidesBySection(state.selectedGeneratedSlidesBySection);
+        }
+        if (state.generatedSlidesBySection) {
+          setGeneratedSlidesBySection(restoreSlidesBySection(state.generatedSlidesBySection));
+        }
+        if (state.generationHistoryBySection) {
+          setGenerationHistoryBySection(state.generationHistoryBySection);
+        }
+        if (state.latestGenerationSnapshotBySection) {
+          setLatestGenerationSnapshotBySection(state.latestGenerationSnapshotBySection);
+        }
+        if (state.currentGenerationSourceLabelBySection) {
+          setCurrentGenerationSourceLabelBySection(state.currentGenerationSourceLabelBySection);
+        }
+        if (state.currentGenerationScriptTextBySection) {
+          setCurrentGenerationScriptTextBySection(state.currentGenerationScriptTextBySection);
+        }
+      } catch {
+        // 原稿下書きは別APIで復元できるため、作業状態の復元失敗だけで画面は止めない。
+      } finally {
+        hasLoadedWorkspaceStateRef.current = true;
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(() => {
+            isRestoringWorkspaceStateRef.current = false;
+            if (isMounted) setWorkspaceStateReady(true);
+          });
+        });
+      }
+    }
+
+    loadWorkspaceState();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadWorkspaceV2State() {
+      try {
+        const response = await fetch("/api/workspace-state-v2");
+        const result = await response.json();
+        if (!isMounted) return;
+
+        const nextState =
+          result.state && typeof result.state === "object"
+            ? (result.state as WorkspaceV2State)
+            : { sections: {} };
+        workspaceV2StateRef.current = nextState;
+        setWorkspaceV2State(nextState);
+      } catch {
+        if (!isMounted) return;
+        workspaceV2StateRef.current = { sections: {} };
+        setWorkspaceV2State({ sections: {} });
+      } finally {
+        if (isMounted) setWorkspaceV2Ready(true);
+      }
+    }
+
+    loadWorkspaceV2State();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    workspaceV2StateRef.current = workspaceV2State;
+  }, [workspaceV2State]);
+
+  useEffect(() => {
+    if (!workspaceV2Ready) return;
+
+    setWorkspaceV2State((prev) => {
+      const previousParagraphs = prev.sections[activeSection]?.paragraphs ?? [];
+      const nextParagraphs = reconcileParagraphSettings(
+        activeSection,
+        currentScript,
+        previousParagraphs
+      );
+
+      if (JSON.stringify(previousParagraphs) === JSON.stringify(nextParagraphs)) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        sections: {
+          ...prev.sections,
+          [activeSection]: {
+            ...(prev.sections[activeSection] ?? {}),
+            paragraphs: nextParagraphs,
+          },
+        },
+      };
+    });
+  }, [activeSection, currentScript, workspaceV2Ready]);
+
+  useEffect(() => {
+    if (!workspaceV2Ready) return;
+
+    const timeoutId = window.setTimeout(async () => {
+      try {
+        await fetch("/api/workspace-state-v2", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ state: workspaceV2StateRef.current }),
+        });
+      } catch {
+        // v2メタデータは次の変更で再保存する。原稿と生成画像は触らない。
+      }
+    }, 800);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [workspaceV2Ready, workspaceV2State]);
+
+  useEffect(() => {
     if (!hasLoadedDraftRef.current) return;
 
     setDraftSaveStatus("saving");
@@ -363,6 +763,47 @@ export function SlideWorkspace() {
 
     return () => window.clearTimeout(timeoutId);
   }, [editedScripts]);
+
+  useEffect(() => {
+    workspaceStateRef.current = workspaceState;
+  }, [workspaceState]);
+
+  async function persistWorkspaceStateNow(state: WorkspacePersistedState) {
+    workspaceStateRef.current = state;
+    await fetch("/api/workspace-state", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ state }),
+    });
+  }
+
+  useEffect(() => {
+    // 生成状態は `handleGenerateSection` の完了時に明示保存する。
+    // 広範囲の状態変更を常時保存すると、復元中の初期値で生成結果を上書きしやすい。
+  }, [
+    activeSection,
+    contentTheme,
+    colorTheme,
+    activeTemplate,
+    activeIllustration,
+    selectedGeneratedSlidesBySection,
+    generatedSlidesBySection,
+    generationHistoryBySection,
+    latestGenerationSnapshotBySection,
+    currentGenerationSourceLabelBySection,
+    currentGenerationScriptTextBySection,
+    workspaceStateReady,
+  ]);
+
+  useEffect(() => {
+    function saveBeforeUnload() {
+      // 原稿は別APIで保存済み。生成結果は生成完了時に保存するため、
+      // unload時の非同期保存で復元状態を壊さないようにする。
+    }
+
+    window.addEventListener("beforeunload", saveBeforeUnload);
+    return () => window.removeEventListener("beforeunload", saveBeforeUnload);
+  }, []);
 
   useEffect(() => {
     const editor = editorRef.current;
@@ -396,9 +837,135 @@ export function SlideWorkspace() {
     return () => observer.disconnect();
   }, [currentScriptText, currentScript.length]);
 
-  function createPendingSlides(): GeneratedSlide[] {
-    return currentScript.map((block) => ({
+  function setSelectedGeneratedSlideForSection(sectionId: number, slideNum: number) {
+    setSelectedGeneratedSlidesBySection((prev) => ({
+      ...prev,
+      [sectionId]: slideNum,
+    }));
+  }
+
+  function updateParagraphSetting(
+    paragraphId: string,
+    updater: (setting: ParagraphSlideSetting) => ParagraphSlideSetting
+  ) {
+    setWorkspaceV2State((prev) => {
+      const section = prev.sections[activeSection] ?? { paragraphs: currentParagraphSettings };
+      const paragraphs = section.paragraphs.map((setting) =>
+        setting.paragraphId === paragraphId ? updater(setting) : setting
+      );
+
+      return {
+        ...prev,
+        sections: {
+          ...prev.sections,
+          [activeSection]: {
+            ...section,
+            paragraphs,
+          },
+        },
+      };
+    });
+  }
+
+  function updateSelectedSlideTemplate(templateId: string) {
+    const setting = selectedParagraphSetting;
+    if (!setting) return;
+    updateParagraphSetting(setting.paragraphId, (current) => ({
+      ...current,
+      templateId,
+      templateSource: "manual",
+    }));
+    setTemplateModalOpen(false);
+    setTemplateModalTargetSlide(null);
+  }
+
+  function updateSelectedSlideIllustration(illustrationId: string) {
+    const setting = selectedParagraphSetting;
+    if (!setting) return;
+    updateParagraphSetting(setting.paragraphId, (current) => ({
+      ...current,
+      illustrationId,
+      illustrationSource: "manual",
+    }));
+  }
+
+  function appendSlideHistoryEntry(
+    sectionId: number,
+    paragraphId: string | undefined,
+    entry: SlideHistoryEntry
+  ) {
+    if (!paragraphId) return;
+
+    setWorkspaceV2State((prev) => {
+      const section = prev.sections[sectionId] ?? { paragraphs: [] };
+      const paragraphs = section.paragraphs.map((setting) =>
+        setting.paragraphId === paragraphId
+          ? {
+              ...setting,
+              slideHistory: [entry, ...(setting.slideHistory ?? [])],
+            }
+          : setting
+      );
+
+      return {
+        ...prev,
+        sections: {
+          ...prev.sections,
+          [sectionId]: {
+            ...section,
+            paragraphs,
+          },
+        },
+      };
+    });
+  }
+
+  async function restoreSlideHistoryEntry(entry: SlideHistoryEntry) {
+    const sectionId = activeSection;
+    const restoredSlides = previewSlides.map((slide) =>
+      slide.paragraphId === entry.slide.paragraphId
+        ? {
+            ...entry.slide,
+            num: slide.num,
+            sourceText: slide.sourceText,
+            count: slide.count,
+          }
+        : slide
+    );
+    setGeneratedSlidesBySection((prev) => ({ ...prev, [sectionId]: restoredSlides }));
+
+    const baseState = workspaceStateRef.current ?? workspaceState;
+    await persistWorkspaceStateNow({
+      ...baseState,
+      activeSection: sectionId,
+      generatedSlidesBySection: {
+        ...baseState.generatedSlidesBySection,
+        [sectionId]: restoredSlides,
+      },
+      selectedGeneratedSlidesBySection: {
+        ...baseState.selectedGeneratedSlidesBySection,
+        [sectionId]: selectedGeneratedSlide,
+      },
+    });
+  }
+
+  function updateGeneratedSlidesForSection(
+    sectionId: number,
+    updater: (slides: GeneratedSlide[]) => GeneratedSlide[]
+  ) {
+    setGeneratedSlidesBySection((prev) => ({
+      ...prev,
+      [sectionId]: updater(prev[sectionId] ?? []),
+    }));
+  }
+
+  function createPendingSlides(
+    scriptBlocks = currentScript,
+    paragraphSettings = currentParagraphSettings
+  ): GeneratedSlide[] {
+    return scriptBlocks.map((block, index) => ({
       num: block.num,
+      paragraphId: paragraphSettings[index]?.paragraphId,
       sourceText: block.text,
       count: block.count,
       status: "idle",
@@ -406,16 +973,88 @@ export function SlideWorkspace() {
     }));
   }
 
-  async function generateSlideImage(slide: GeneratedSlide) {
+  function normalizeSlideSource(text: string) {
+    return text
+      .replace(/\r\n/g, "\n")
+      .replace(/\u00a0/g, " ")
+      .split("\n")
+      .map((line) => line.trimEnd())
+      .join("\n")
+      .trim();
+  }
+
+  function mergeGeneratedSlidesWithScript(
+    scriptBlocks: ScriptBlock[],
+    savedSlides: GeneratedSlide[],
+    paragraphSettings: ParagraphSlideSetting[]
+  ): GeneratedSlide[] {
+    const usedSavedIndexes = new Set<number>();
+
+    return scriptBlocks.map((block, blockIndex) => {
+      const paragraphId = paragraphSettings[blockIndex]?.paragraphId;
+      const blockKey = normalizeSlideSource(block.text);
+      const paragraphIndex = paragraphId
+        ? savedSlides.findIndex((slide, index) => {
+            if (usedSavedIndexes.has(index)) return false;
+            return slide.paragraphId === paragraphId;
+          })
+        : -1;
+      const exactIndex = savedSlides.findIndex((slide, index) => {
+        if (usedSavedIndexes.has(index)) return false;
+        return slide.num === block.num && normalizeSlideSource(slide.sourceText) === blockKey;
+      });
+      const fallbackIndex =
+        paragraphIndex >= 0
+          ? paragraphIndex
+          : exactIndex >= 0
+          ? exactIndex
+          : savedSlides.findIndex((slide, index) => {
+              if (usedSavedIndexes.has(index)) return false;
+              return normalizeSlideSource(slide.sourceText) === blockKey;
+            });
+
+      if (fallbackIndex >= 0) {
+        usedSavedIndexes.add(fallbackIndex);
+        const savedSlide = savedSlides[fallbackIndex];
+        return {
+          ...savedSlide,
+          num: block.num,
+          paragraphId,
+          sourceText: block.text,
+          count: block.count,
+          title: savedSlide.title || block.text.split("\n")[0]?.slice(0, 28) || `Slide ${block.num}`,
+        };
+      }
+
+      return {
+        num: block.num,
+        paragraphId,
+        sourceText: block.text,
+        count: block.count,
+        status: "idle",
+        title: block.text.split("\n")[0]?.slice(0, 28) || `Slide ${block.num}`,
+      };
+    });
+  }
+
+  async function generateSlideImage(
+    slide: GeneratedSlide,
+    context: {
+      sectionTitle: string;
+      template: string;
+      illustration: string;
+      colorTheme: ColorTheme;
+    }
+  ) {
     const response = await fetch("/api/regenerate-slide", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        sectionTitle: `${currentSection.title} / ${slide.num}枚目`,
+        sectionTitle: context.sectionTitle,
         script: slide.sourceText,
-        template: activeTemplate,
-        illustration: illustrationLabel,
-        colorTheme,
+        template: context.template,
+        illustration: context.illustration,
+        colorTheme: context.colorTheme,
       }),
     });
 
@@ -431,7 +1070,11 @@ export function SlideWorkspace() {
 
   async function handleGenerateSection() {
     if (currentScript.length === 0) return;
+    const sectionId = activeSection;
+    const sectionTitle = currentSection.title;
     const sourceScriptText = currentScriptText;
+    const scriptBlocks = currentScript;
+    const generationColorTheme = colorTheme;
     if (
       currentScript.length > 10 &&
       !window.confirm(`${currentScript.length}枚生成します。続けますか？`)
@@ -439,34 +1082,57 @@ export function SlideWorkspace() {
       return;
     }
 
-    setLatestGenerationSnapshot(null);
-    setCurrentGenerationSourceLabel(null);
+    setLatestGenerationSnapshotBySection((prev) => ({ ...prev, [sectionId]: null }));
+    setCurrentGenerationSourceLabelBySection((prev) => ({ ...prev, [sectionId]: null }));
 
-    if (generatedSlides.length > 0) {
-      setGenerationHistory((prev) => [
-        {
-          id: Date.now(),
-          createdAt: new Date().toLocaleString("ja-JP"),
-          scriptText: currentGenerationScriptText ?? currentScriptText,
-          slides: generatedSlides,
-          template: activeTemplate,
-          illustration: illustrationLabel,
-          colorTheme,
-        },
-        ...prev,
-      ]);
+    const generatedSnapshotSlides = previewSlides.filter(
+      (slide) => slide.status !== "idle" || slide.imagePath || slide.error
+    );
+    const historyEntry =
+      generatedSnapshotSlides.length > 0
+        ? {
+            id: Date.now(),
+            createdAt: new Date().toLocaleString("ja-JP"),
+            scriptText: currentGenerationScriptText ?? currentScriptText,
+            slides: generatedSnapshotSlides,
+            template: "スライド別",
+            illustration: "スライド別",
+            colorTheme: generationColorTheme,
+          }
+        : null;
+    const nextHistoryBySection = historyEntry
+      ? {
+          ...generationHistoryBySection,
+          [sectionId]: [historyEntry, ...(generationHistoryBySection[sectionId] ?? [])],
+        }
+      : generationHistoryBySection;
+
+    if (historyEntry) {
+      setGenerationHistoryBySection(nextHistoryBySection);
     }
 
-    setIsMockGenerating(true);
-    setCurrentGenerationScriptText(sourceScriptText);
-    setSelectedGeneratedSlide(1);
+    setGeneratingSections((prev) => ({ ...prev, [sectionId]: true }));
+    setCurrentGenerationScriptTextBySection((prev) => ({
+      ...prev,
+      [sectionId]: sourceScriptText,
+    }));
+    setSelectedGeneratedSlideForSection(sectionId, 1);
 
-    const nextSlides = createPendingSlides();
-    setGeneratedSlides(nextSlides);
+    const nextSlides = createPendingSlides(scriptBlocks, currentParagraphSettings);
+    let completedSlides = nextSlides;
+    setGeneratedSlidesBySection((prev) => ({ ...prev, [sectionId]: nextSlides }));
 
     for (const slide of nextSlides) {
-      setSelectedGeneratedSlide(slide.num);
-      setGeneratedSlides((prev) =>
+      const setting = currentParagraphSettings[slide.num - 1];
+      const templateForSlide = getTemplateById(setting?.templateId ?? DEFAULT_TEMPLATE_ID);
+      const illustrationForSlide = getIllustrationById(
+        setting?.illustrationId ?? DEFAULT_ILLUSTRATION_ID
+      );
+      setSelectedGeneratedSlideForSection(sectionId, slide.num);
+      completedSlides = completedSlides.map((item) =>
+        item.num === slide.num ? { ...item, status: "generating", error: undefined } : item
+      );
+      updateGeneratedSlidesForSection(sectionId, (prev) =>
         prev.map((item) =>
           item.num === slide.num
             ? { ...item, status: "generating", error: undefined }
@@ -475,16 +1141,46 @@ export function SlideWorkspace() {
       );
 
       try {
-        const imagePath = await generateSlideImage(slide);
-        setGeneratedSlides((prev) =>
+        const imagePath = await generateSlideImage(slide, {
+          sectionTitle: `${sectionTitle} / ${slide.num}枚目`,
+          template: templateForSlide.id,
+          illustration: illustrationForSlide.label,
+          colorTheme: generationColorTheme,
+        });
+        completedSlides = completedSlides.map((item) =>
+          item.num === slide.num
+            ? { ...item, status: "done", imagePath, error: undefined }
+            : item
+        );
+        updateGeneratedSlidesForSection(sectionId, (prev) =>
           prev.map((item) =>
             item.num === slide.num
               ? { ...item, status: "done", imagePath, error: undefined }
               : item
           )
         );
+        appendSlideHistoryEntry(sectionId, slide.paragraphId, {
+          id: Date.now() + slide.num,
+          createdAt: new Date().toLocaleString("ja-JP"),
+          slide: { ...slide, status: "done", imagePath, error: undefined },
+          templateId: templateForSlide.id,
+          templateLabel: templateForSlide.label,
+          illustrationId: illustrationForSlide.id,
+          illustrationLabel: illustrationForSlide.label,
+          colorTheme: generationColorTheme,
+        });
       } catch (error) {
-        setGeneratedSlides((prev) =>
+        completedSlides = completedSlides.map((item) =>
+          item.num === slide.num
+            ? {
+                ...item,
+                status: "failed",
+                imagePath: undefined,
+                error: error instanceof Error ? error.message : "生成に失敗しました",
+              }
+            : item
+        );
+        updateGeneratedSlidesForSection(sectionId, (prev) =>
           prev.map((item) =>
             item.num === slide.num
               ? {
@@ -499,32 +1195,116 @@ export function SlideWorkspace() {
       }
     }
 
-    setIsMockGenerating(false);
+    setGeneratingSections((prev) => ({ ...prev, [sectionId]: false }));
+    const baseState = workspaceStateRef.current ?? workspaceState;
+    await persistWorkspaceStateNow({
+      ...baseState,
+      activeSection: sectionId,
+      contentTheme,
+      colorTheme: generationColorTheme,
+      activeTemplate: selectedTemplate.id,
+      activeIllustration,
+      selectedGeneratedSlidesBySection: {
+        ...baseState.selectedGeneratedSlidesBySection,
+        [sectionId]: completedSlides[completedSlides.length - 1]?.num ?? 1,
+      },
+      generatedSlidesBySection: {
+        ...baseState.generatedSlidesBySection,
+        [sectionId]: completedSlides,
+      },
+      generationHistoryBySection: nextHistoryBySection,
+      latestGenerationSnapshotBySection: {
+        ...baseState.latestGenerationSnapshotBySection,
+        [sectionId]: null,
+      },
+      currentGenerationSourceLabelBySection: {
+        ...baseState.currentGenerationSourceLabelBySection,
+        [sectionId]: null,
+      },
+      currentGenerationScriptTextBySection: {
+        ...baseState.currentGenerationScriptTextBySection,
+        [sectionId]: sourceScriptText,
+      },
+    });
   }
 
   async function retryMockSlide(slideNum: number) {
-    const targetSlide = generatedSlides.find((slide) => slide.num === slideNum);
+    const sectionId = activeSection;
+    const targetSlide = previewSlides.find((slide) => slide.num === slideNum);
     if (!targetSlide) return;
+    const setting = currentParagraphSettings[slideNum - 1];
+    const templateForSlide = getTemplateById(setting?.templateId ?? DEFAULT_TEMPLATE_ID);
+    const illustrationForSlide = getIllustrationById(
+      setting?.illustrationId ?? DEFAULT_ILLUSTRATION_ID
+    );
 
-    setIsMockGenerating(true);
-    setSelectedGeneratedSlide(slideNum);
-    setGeneratedSlides((prev) =>
+    setGeneratingSections((prev) => ({ ...prev, [sectionId]: true }));
+    setSelectedGeneratedSlideForSection(sectionId, slideNum);
+    const nextBaseSlides: GeneratedSlide[] = previewSlides.map((slide) =>
+      slide.num === slideNum ? { ...slide, status: "generating", error: undefined } : slide
+    );
+    setGeneratedSlidesBySection((prev) => ({ ...prev, [sectionId]: nextBaseSlides }));
+    updateGeneratedSlidesForSection(sectionId, (prev) =>
       prev.map((item) =>
         item.num === slideNum ? { ...item, status: "generating", error: undefined } : item
       )
     );
 
     try {
-      const imagePath = await generateSlideImage(targetSlide);
-      setGeneratedSlides((prev) =>
+      const imagePath = await generateSlideImage(targetSlide, {
+        sectionTitle: `${currentSection.title} / ${targetSlide.num}枚目`,
+        template: templateForSlide.id,
+        illustration: illustrationForSlide.label,
+        colorTheme,
+      });
+      const doneSlides: GeneratedSlide[] = nextBaseSlides.map((item) =>
+        item.num === slideNum ? { ...item, status: "done", imagePath, error: undefined } : item
+      );
+      setGeneratedSlidesBySection((prev) => ({ ...prev, [sectionId]: doneSlides }));
+      updateGeneratedSlidesForSection(sectionId, (prev) =>
         prev.map((item) =>
           item.num === slideNum
             ? { ...item, status: "done", imagePath, error: undefined }
             : item
         )
       );
+      appendSlideHistoryEntry(sectionId, targetSlide.paragraphId, {
+        id: Date.now() + slideNum,
+        createdAt: new Date().toLocaleString("ja-JP"),
+        slide: { ...targetSlide, status: "done", imagePath, error: undefined },
+        templateId: templateForSlide.id,
+        templateLabel: templateForSlide.label,
+        illustrationId: illustrationForSlide.id,
+        illustrationLabel: illustrationForSlide.label,
+        colorTheme,
+      });
+      const baseState = workspaceStateRef.current ?? workspaceState;
+      await persistWorkspaceStateNow({
+        ...baseState,
+        activeSection: sectionId,
+        colorTheme,
+        generatedSlidesBySection: {
+          ...baseState.generatedSlidesBySection,
+          [sectionId]: doneSlides,
+        },
+        selectedGeneratedSlidesBySection: {
+          ...baseState.selectedGeneratedSlidesBySection,
+          [sectionId]: slideNum,
+        },
+      });
     } catch (error) {
-      setGeneratedSlides((prev) =>
+      const failedSlides: GeneratedSlide[] = nextBaseSlides.map((item) =>
+        item.num === slideNum
+          ? {
+              ...item,
+              status: "failed",
+              imagePath: undefined,
+              error: error instanceof Error ? error.message : "生成に失敗しました",
+            }
+          : item
+      );
+      setGeneratedSlidesBySection((prev) => ({ ...prev, [sectionId]: failedSlides }));
+      updateGeneratedSlidesForSection(sectionId, (prev) =>
         prev.map((item) =>
           item.num === slideNum
             ? {
@@ -537,41 +1317,58 @@ export function SlideWorkspace() {
         )
       );
     }
-    setIsMockGenerating(false);
+    setGeneratingSections((prev) => ({ ...prev, [sectionId]: false }));
   }
 
   function restoreHistory(history: GenerationHistory, sourceLabel: string) {
+    const sectionId = activeSection;
     if (!latestGenerationSnapshot && !currentGenerationSourceLabel && generatedSlides.length > 0) {
-      setLatestGenerationSnapshot({
-        id: Date.now(),
-        createdAt: new Date().toLocaleString("ja-JP"),
-        scriptText: currentGenerationScriptText ?? currentScriptText,
-        slides: generatedSlides,
-        template: activeTemplate,
-        illustration: illustrationLabel,
-        colorTheme,
-      });
+      setLatestGenerationSnapshotBySection((prev) => ({
+        ...prev,
+        [sectionId]: {
+          id: Date.now(),
+          createdAt: new Date().toLocaleString("ja-JP"),
+          scriptText: currentGenerationScriptText ?? currentScriptText,
+          slides: generatedSlides,
+          template: activeTemplate,
+          illustration: illustrationLabel,
+          colorTheme,
+        },
+      }));
     }
-    setGeneratedSlides(history.slides);
+    setGeneratedSlidesBySection((prev) => ({ ...prev, [sectionId]: history.slides }));
     setActiveTemplate(history.template);
     setActiveIllustration(history.illustration);
     setColorTheme(history.colorTheme);
-    setCurrentGenerationScriptText(history.scriptText);
-    setCurrentGenerationSourceLabel(sourceLabel);
-    setSelectedGeneratedSlide(history.slides[0]?.num ?? 1);
+    setCurrentGenerationScriptTextBySection((prev) => ({
+      ...prev,
+      [sectionId]: history.scriptText,
+    }));
+    setCurrentGenerationSourceLabelBySection((prev) => ({
+      ...prev,
+      [sectionId]: sourceLabel,
+    }));
+    setSelectedGeneratedSlideForSection(sectionId, history.slides[0]?.num ?? 1);
     setHistoryOpen(false);
   }
 
   function restoreLatestGeneration() {
     if (!latestGenerationSnapshot) return;
-    setGeneratedSlides(latestGenerationSnapshot.slides);
+    const sectionId = activeSection;
+    setGeneratedSlidesBySection((prev) => ({
+      ...prev,
+      [sectionId]: latestGenerationSnapshot.slides,
+    }));
     setActiveTemplate(latestGenerationSnapshot.template);
     setActiveIllustration(latestGenerationSnapshot.illustration);
     setColorTheme(latestGenerationSnapshot.colorTheme);
-    setCurrentGenerationScriptText(latestGenerationSnapshot.scriptText);
-    setCurrentGenerationSourceLabel(null);
-    setSelectedGeneratedSlide(latestGenerationSnapshot.slides[0]?.num ?? 1);
-    setLatestGenerationSnapshot(null);
+    setCurrentGenerationScriptTextBySection((prev) => ({
+      ...prev,
+      [sectionId]: latestGenerationSnapshot.scriptText,
+    }));
+    setCurrentGenerationSourceLabelBySection((prev) => ({ ...prev, [sectionId]: null }));
+    setSelectedGeneratedSlideForSection(sectionId, latestGenerationSnapshot.slides[0]?.num ?? 1);
+    setLatestGenerationSnapshotBySection((prev) => ({ ...prev, [sectionId]: null }));
     setHistoryOpen(false);
   }
 
@@ -829,7 +1626,7 @@ export function SlideWorkspace() {
         {/* === 4区: 選択中テンプレート / イラスト候補 / 生成後プレビュー === */}
         <article className="flex flex-col overflow-hidden bg-[#f8fafc]">
           <div className="grid gap-3.5 p-4 overflow-auto h-full content-start">
-            {/* 選択中テンプレート */}
+            {/* 選択中スライド設定 */}
             <div
               className={`border border-slate-200 rounded-xl bg-white p-3.5 transition-opacity ${
                 isMockGenerating ? "opacity-55 pointer-events-none" : ""
@@ -837,19 +1634,59 @@ export function SlideWorkspace() {
               aria-disabled={isMockGenerating}
             >
               <div className="flex justify-between gap-2 mb-2.5 text-slate-700 text-[13px] font-black">
-                <span>選択中テンプレート</span>
-              </div>
-              <div className="flex items-center justify-between gap-2.5 px-3 py-2.5 border border-slate-200 rounded-[10px] bg-slate-50">
-                <span className="text-slate-700 text-[13px] font-black">
-                  {activeTemplate}
+                <span>選択中スライド設定</span>
+                <span className="text-[11px] text-slate-400">
+                  {selectedParagraphSetting ? `スライド${selectedGeneratedSlide}` : "-"}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => setTemplateModalOpen(true)}
-                  className="min-h-[30px] px-2.5 border border-slate-200 rounded-lg bg-white text-slate-600 text-[12px] font-extrabold hover:bg-slate-50"
-                >
-                  変更
-                </button>
+              </div>
+              <div className="grid gap-2.5">
+                <div className="flex items-center justify-between gap-2.5 px-3 py-2.5 border border-slate-200 rounded-[10px] bg-slate-50">
+                  <div className="min-w-0">
+                    <span className="block truncate text-slate-700 text-[13px] font-black">
+                      {selectedTemplate.label}
+                    </span>
+                    <span className="mt-0.5 block text-[10px] font-bold text-slate-400">
+                      {selectedParagraphSetting?.templateSource === "manual"
+                        ? "手動設定"
+                        : "AIおすすめ"}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTemplateModalTargetSlide(selectedGeneratedSlide);
+                      setTemplateModalOpen(true);
+                    }}
+                    className="min-h-[30px] px-2.5 border border-slate-200 rounded-lg bg-white text-slate-600 text-[12px] font-extrabold hover:bg-slate-50"
+                  >
+                    変更
+                  </button>
+                </div>
+                <p className="text-[11px] leading-[1.5] text-slate-500">
+                  {selectedTemplate.description}
+                </p>
+                {selectedParagraphSetting?.slideHistory?.length ? (
+                  <div className="border-t border-slate-100 pt-2">
+                    <div className="mb-1.5 text-[11px] font-black text-slate-500">
+                      このスライドの履歴
+                    </div>
+                    <div className="grid gap-1.5">
+                      {selectedParagraphSetting.slideHistory.slice(0, 3).map((history) => (
+                        <button
+                          key={history.id}
+                          type="button"
+                          onClick={() => restoreSlideHistoryEntry(history)}
+                          className="rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-left text-[10px] leading-[1.4] text-slate-500 hover:border-[#0f5f7a] hover:bg-cyan-50"
+                        >
+                          <span className="block font-black text-slate-700">
+                            {history.templateLabel} / {history.illustrationLabel}
+                          </span>
+                          <span className="mt-0.5 block">{history.createdAt}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
               </div>
             </div>
 
@@ -868,9 +1705,9 @@ export function SlideWorkspace() {
                   <button
                     key={opt.id}
                     type="button"
-                    onClick={() => setActiveIllustration(opt.id)}
+                    onClick={() => updateSelectedSlideIllustration(opt.id)}
                     className={`grid gap-2 p-2 border rounded-[10px] text-[11px] font-extrabold text-center transition-colors ${
-                      activeIllustration === opt.id
+                      selectedIllustration.id === opt.id
                         ? "border-[#0f5f7a] bg-cyan-50 text-[#0f5f7a]"
                         : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
                     }`}
@@ -880,6 +1717,11 @@ export function SlideWorkspace() {
                   </button>
                 ))}
               </div>
+              <p className="mt-2 text-[10px] font-bold text-slate-400">
+                {selectedParagraphSetting?.illustrationSource === "manual"
+                  ? "このスライドの手動設定"
+                  : "このスライドのAIおすすめ"}
+              </p>
             </div>
 
             {/* 配色テーマ選択 */}
@@ -952,6 +1794,14 @@ export function SlideWorkspace() {
                   : isGeneratedStale
                     ? `更新した原稿で${currentScript.length}枚再生成`
                     : `この条件で${currentScript.length}枚生成`}
+              </button>
+              <button
+                type="button"
+                onClick={() => retryMockSlide(selectedGeneratedSlide)}
+                disabled={isMockGenerating || !displaySelectedSlide}
+                className="mt-2 w-full min-h-[38px] rounded-lg border border-slate-200 bg-white text-[12px] font-extrabold text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-50"
+              >
+                選択中の1枚だけ生成
               </button>
               {historyOpen && (
                 <div className="mt-3 grid gap-2 border-t border-slate-100 pt-3">
@@ -1047,7 +1897,7 @@ export function SlideWorkspace() {
                   <button
                     key={slide.num}
                     type="button"
-                    onClick={() => setSelectedGeneratedSlide(slide.num)}
+                    onClick={() => setSelectedGeneratedSlideForSection(activeSection, slide.num)}
                     aria-label={`スライド${slide.num}を選択`}
                     className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-[12px] font-black transition-colors ${
                       selectedGeneratedSlide === slide.num
@@ -1129,7 +1979,10 @@ export function SlideWorkspace() {
       {templateModalOpen && (
         <div
           className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
-          onClick={() => setTemplateModalOpen(false)}
+          onClick={() => {
+            setTemplateModalOpen(false);
+            setTemplateModalTargetSlide(null);
+          }}
           role="dialog"
           aria-modal="true"
         >
@@ -1138,10 +1991,15 @@ export function SlideWorkspace() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4 sticky top-0 bg-white pb-3 border-b border-slate-200">
-              <h2 className="text-xl font-black">テンプレートを選ぶ</h2>
+              <h2 className="text-xl font-black">
+                スライド{templateModalTargetSlide ?? selectedGeneratedSlide}のテンプレートを選ぶ
+              </h2>
               <button
                 type="button"
-                onClick={() => setTemplateModalOpen(false)}
+                onClick={() => {
+                  setTemplateModalOpen(false);
+                  setTemplateModalTargetSlide(null);
+                }}
                 className="min-h-[36px] px-4 border border-slate-200 rounded-lg bg-white text-slate-600 text-[13px] font-extrabold hover:bg-slate-50"
               >
                 閉じる
@@ -1153,10 +2011,11 @@ export function SlideWorkspace() {
                   key={tmpl.id}
                   type="button"
                   onClick={() => {
-                    setActiveTemplate(tmpl.id);
-                    setTemplateModalOpen(false);
+                    updateSelectedSlideTemplate(tmpl.id);
                   }}
-                  className="border border-slate-200 rounded-xl p-2 hover:border-[#0f5f7a] hover:shadow-md transition-all bg-white"
+                  className={`border rounded-xl p-2 hover:border-[#0f5f7a] hover:shadow-md transition-all bg-white ${
+                    selectedTemplate.id === tmpl.id ? "border-[#0f5f7a]" : "border-slate-200"
+                  }`}
                 >
                   <img
                     src={tmpl.src}
@@ -1164,7 +2023,11 @@ export function SlideWorkspace() {
                     className="w-full rounded-lg"
                   />
                   <div className="mt-2 text-[12px] font-bold text-slate-700 text-left px-1">
-                    {tmpl.id}
+                    {tmpl.label}
+                    <span className="ml-1 text-[10px] text-slate-400">{tmpl.id}</span>
+                  </div>
+                  <div className="mt-1 px-1 text-left text-[10px] leading-[1.4] text-slate-400">
+                    {tmpl.description}
                   </div>
                 </button>
               ))}

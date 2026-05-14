@@ -1,0 +1,51 @@
+{
+  "updatedAt": "2026-05-14T08:20:48.488Z",
+  "state": {
+    "sections": {
+      "2": {
+        "paragraphs": [
+          {
+            "paragraphId": "s2-p1-qswajc",
+            "textFingerprint": "9rh2iw",
+            "templateId": "T04",
+            "templateSource": "recommended",
+            "illustrationId": "graph",
+            "illustrationSource": "recommended",
+            "slideHistory": []
+          }
+        ]
+      },
+      "3": {
+        "paragraphs": [
+          {
+            "paragraphId": "s3-p1-h59wmf",
+            "textFingerprint": "h59wmf",
+            "templateId": "T03",
+            "templateSource": "recommended",
+            "illustrationId": "graph",
+            "illustrationSource": "recommended",
+            "slideHistory": []
+          },
+          {
+            "paragraphId": "s3-p2-gjoolx",
+            "textFingerprint": "gjoolx",
+            "templateId": "T06",
+            "templateSource": "manual",
+            "illustrationId": "graph",
+            "illustrationSource": "recommended",
+            "slideHistory": []
+          },
+          {
+            "paragraphId": "s3-p3-1s50lxf",
+            "textFingerprint": "1s50lxf",
+            "templateId": "T01",
+            "templateSource": "recommended",
+            "illustrationId": "step",
+            "illustrationSource": "recommended",
+            "slideHistory": []
+          }
+        ]
+      }
+    }
+  }
+}
