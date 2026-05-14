@@ -1525,20 +1525,38 @@ export function SlideWorkspace() {
     });
   }
 
-  async function handleLaunchPipeline() {
+  // claude-cli:// deep link を発火してローカルの Claude Code を起動する。
+  // 公式仕様: https://code.claude.com/docs/en/deep-links （Claude Code v2.1.91 以降）
+  // cwd は各ユーザーのローカルパスなので localStorage に保存する。
+  function handleLaunchPipeline() {
     if (launchingPipeline) return;
     setLaunchingPipeline(true);
     try {
-      const res = await fetch("/api/launch-script-pipeline", { method: "POST" });
-      const data = (await res.json()) as { ok?: boolean; error?: string; cwd?: string };
-      if (!res.ok) {
-        window.alert(`起動失敗: ${data.error ?? "unknown error"}`);
-        return;
+      const STORAGE_KEY = "demo-04-slide-workspace:local-cwd";
+      let cwd = localStorage.getItem(STORAGE_KEY);
+      if (!cwd) {
+        const input = window.prompt(
+          [
+            "ローカルの demo-04-slide-workspace の絶対パスを入力してください。",
+            "（一度入力すると次回以降は自動で使われます）",
+            "",
+            "例: /Users/yujikubo/Desktop/Reviatro-HQ/projects/portfolio-demo/demo-04-slide-workspace",
+          ].join("\n"),
+          ""
+        );
+        if (!input || !input.trim()) return;
+        cwd = input.trim();
+        localStorage.setItem(STORAGE_KEY, cwd);
       }
+
+      const prompt = "スライド原稿作成開始";
+      const url = `claude-cli://open?cwd=${encodeURIComponent(cwd)}&q=${encodeURIComponent(prompt)}`;
+      window.location.href = url;
+
       setConfirmState({
-        title: "ターミナルを起動しました",
+        title: "Claude Code を起動しました",
         message:
-          "別のターミナルウィンドウで Claude Code が起動し、grill-me による原稿要件の対話が始まります。対話とパイプラインが完了したら、この画面をリロードして反映を確認してください。",
+          "ローカルの Claude Code が立ち上がり、プロンプト「スライド原稿作成開始」がプリフィルされます。Enter で送信すると grill-me による原稿要件の対話が始まります。\n\n反映を確認するには、対話・パイプライン完了後にこの画面をリロードしてください。",
         confirmLabel: "OK",
         onConfirm: () => setConfirmState(null),
       });
