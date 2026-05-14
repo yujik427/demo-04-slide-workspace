@@ -2601,31 +2601,6 @@ export function SlideWorkspace() {
                     変更
                   </button>
                 </div>
-                <p className="text-[11px] leading-[1.5] text-slate-500">
-                  {selectedTemplate.description}
-                </p>
-                {selectedParagraphSetting?.slideHistory?.length ? (
-                  <div className="border-t border-slate-100 pt-2">
-                    <div className="mb-1.5 text-[11px] font-black text-slate-500">
-                      このスライドの履歴
-                    </div>
-                    <div className="grid gap-1.5">
-                      {selectedParagraphSetting.slideHistory.slice(0, 3).map((history) => (
-                        <button
-                          key={history.id}
-                          type="button"
-                          onClick={() => restoreSlideHistoryEntry(history)}
-                          className="rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-left text-[10px] leading-[1.4] text-slate-500 hover:border-[#0f5f7a] hover:bg-cyan-50"
-                        >
-                          <span className="block font-black text-slate-700">
-                            {history.templateLabel} / {history.illustrationLabel}
-                          </span>
-                          <span className="mt-0.5 block">{history.createdAt}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
               </div>
             </div>
 
