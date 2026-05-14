@@ -2204,17 +2204,18 @@ export function SlideWorkspace() {
       >
         {/* === 1区: 全体ナビ === */}
         <article className="flex flex-col border-r border-slate-200 bg-white overflow-hidden">
-          <div className="p-3.5 flex flex-col h-full">
-            <div className="grid grid-cols-[76px_1fr] items-center gap-3 border-b border-slate-200/50 pb-3.5 mb-3.5">
+          <div className="flex flex-col h-full">
+            <div className="grid grid-cols-[60px_1fr] items-center gap-3 px-3.5 min-h-[64px] border-b border-slate-200/50 bg-white">
               <img
                 src="/addness-logo.png"
                 alt="アドネス株式会社"
-                className="block w-[72px] max-h-[38px] object-contain"
+                className="block w-[60px] max-h-[32px] object-contain"
               />
-              <div className="text-[14px] font-black leading-tight truncate text-[#172033]">
-                全体カリキュラム
+              <div className="text-[16px] font-black leading-tight truncate text-[#172033]">
+                Addness Slide Studio
               </div>
             </div>
+            <div className="p-3.5 flex flex-col flex-1 min-h-0 overflow-auto">
             <nav className="grid gap-3 overflow-y-auto pr-1">
               {(["lecture", "bootcamp"] as const).map((themeKey) => {
                 const themeLabel = themeKey === "bootcamp" ? "CCブートキャンプ" : "講義スライド";
@@ -2319,19 +2320,20 @@ export function SlideWorkspace() {
                 );
               })}
             </nav>
-            <div className="mt-auto pt-4 border-t border-slate-200/50 text-[11px] text-slate-400 leading-[1.6]">
-              テーマ内容: {contentTheme === "bootcamp" ? "Claude Code 販売" : "講義"}
             </div>
+            <footer className="mt-auto min-h-[60px] flex items-center px-4 border-t border-slate-200/50 text-[11px] text-slate-400 leading-[1.6]">
+              テーマ内容: {contentTheme === "bootcamp" ? "Claude Code 販売" : "講義"}
+            </footer>
           </div>
         </article>
 
         {/* === 2区: セクション一覧 === */}
         <article className="flex flex-col border-r border-slate-200 bg-white overflow-hidden">
-          <header className="px-[18px] pt-[18px] pb-3 border-b border-slate-200/50">
-            <h2 className="text-[19px] leading-tight tracking-tight font-bold">
+          <header className="px-[18px] min-h-[64px] flex flex-col justify-center border-b border-slate-200/50">
+            <h2 className="text-[15px] leading-tight tracking-tight font-bold truncate">
               {headerTitle}
             </h2>
-            <p className="mt-2 text-[12px] text-slate-500">
+            <p className="mt-0.5 text-[11px] text-slate-500">
               全体 {sectionTotalApproved}/{sectionTotalSlides}枚
             </p>
           </header>
@@ -2429,10 +2431,9 @@ export function SlideWorkspace() {
               </div>
             )}
           </div>
-          <footer className="mt-auto border-t border-slate-200/50 p-4 text-[12px] text-slate-500 leading-[1.8]">
-            進捗 {sectionTotalApproved}/{sectionTotalSlides}枚
-            <br />
-            想定時間 12/15分
+          <footer className="mt-auto min-h-[60px] flex flex-col justify-center px-4 border-t border-slate-200/50 text-[12px] text-slate-500 leading-[1.6]">
+            <span>進捗 {sectionTotalApproved}/{sectionTotalSlides}枚</span>
+            <span>想定時間 12/15分</span>
           </footer>
         </article>
 
@@ -2542,7 +2543,7 @@ export function SlideWorkspace() {
             </div>
 
             {/* 原稿を箱で囲わず、状態だけを下端に控えめに出す */}
-            <div className="flex items-center justify-between border-t border-slate-200/60 bg-white px-8 py-3 text-[11px] text-slate-400">
+            <div className="flex items-center justify-between min-h-[60px] border-t border-slate-200/60 bg-white px-8 text-[11px] text-slate-400">
               <span>全{currentScript.length}段落</span>
               <div className="flex items-center gap-3">
                 <span>
