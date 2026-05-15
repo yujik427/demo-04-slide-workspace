@@ -26,9 +26,10 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir, readFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
+import { getSupabaseAdmin, STORAGE_BUCKET } from "@/lib/supabase";
 
 // .env.local を直接読む（Claude Code 環境では ANTHROPIC_API_KEY="" が
 // シェルに事前設定され、Next.js の dotenv が上書きしないため、回避策）
@@ -328,42 +329,59 @@ ${script}`;
     }
     const imageElapsed = Date.now() - imageStart;
 
-    // === Step 3: PNG として public/regenerated に保存 ===
+    // === Step 3: PNG として Supabase Storage にアップロード ===
     const timestamp = Date.now();
-    const outDir = path.join(process.cwd(), "public", "regenerated", `${timestamp}`);
-    await mkdir(outDir, { recursive: true });
+    const supabase = getSupabaseAdmin();
+    const pngObjectPath = `${timestamp}/slide-1.png`;
+    const designObjectPath = `${timestamp}/image-design.json`;
 
-    const pngPath = path.join(outDir, "slide-1.png");
-    await writeFile(pngPath, Buffer.from(b64, "base64"));
+    const { error: pngUploadError } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .upload(pngObjectPath, Buffer.from(b64, "base64"), {
+        contentType: "image/png",
+        upsert: false,
+      });
+
+    if (pngUploadError) {
+      return NextResponse.json(
+        { error: `Storage upload failed: ${pngUploadError.message}` },
+        { status: 500 }
+      );
+    }
 
     // 設計図（image-design.json）も保存（再現性のため）
-    const designPath = path.join(outDir, "image-design.json");
-    await writeFile(
-      designPath,
-      JSON.stringify(
-        {
-          type: "single",
-          style_base: themeConfig.style_base,
-          style_description: themeConfig.style_description,
-          preset: "video-slide",
-          images: [imageSpec],
-          meta: {
-            sectionTitle,
-            template,
-            illustration,
-            colorTheme,
-            generatedAt: new Date(timestamp).toISOString(),
-          },
+    const designJson = JSON.stringify(
+      {
+        type: "single",
+        style_base: themeConfig.style_base,
+        style_description: themeConfig.style_description,
+        preset: "video-slide",
+        images: [imageSpec],
+        meta: {
+          sectionTitle,
+          template,
+          illustration,
+          colorTheme,
+          generatedAt: new Date(timestamp).toISOString(),
         },
-        null,
-        2
-      )
+      },
+      null,
+      2
     );
+    await supabase.storage
+      .from(STORAGE_BUCKET)
+      .upload(designObjectPath, designJson, {
+        contentType: "application/json",
+        upsert: false,
+      });
 
-    // === Step 4: パスとメタを返す ===
-    const publicImagePath = `/regenerated/${timestamp}/slide-1.png`;
+    // === Step 4: 公開 URL とメタを返す ===
+    const { data: urlData } = supabase.storage
+      .from(STORAGE_BUCKET)
+      .getPublicUrl(pngObjectPath);
+
     return NextResponse.json({
-      imagePath: publicImagePath,
+      imagePath: urlData.publicUrl,
       imageSpec,
       themeName: themeConfig.name,
       timings: {
