@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2026-05-14T16:01:49.776Z",
+  "updatedAt": "2026-05-14T15:59:54.499Z",
   "state": {
     "activeSection": 13,
-    "contentTheme": "bootcamp",
-    "colorTheme": "lecture",
+    "contentTheme": "lecture",
+    "colorTheme": "bootcamp",
     "activeTemplate": "T04",
     "activeIllustration": "数字グラフ",
     "selectedGeneratedSlidesBySection": {
@@ -247,7 +247,7 @@
           "count": 37,
           "status": "done",
           "title": "これはテスト用の原稿です。タイトルはAddness Sl",
-          "imagePath": "/regenerated/1778774509762/slide-1.png"
+          "imagePath": "/regenerated/1778774394363/slide-1.png"
         }
       ],
       "14": [

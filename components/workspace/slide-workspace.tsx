@@ -8,6 +8,10 @@ import {
   useState,
   type FormEvent,
 } from "react";
+import { renderSingleSlideHtml } from "@/lib/slide-renderer";
+import type { Slide } from "@/lib/slide-types";
+import { CoverConfigPanel, type CoverData } from "@/components/workspace/cover-config-panel";
+import { CoverLivePreviewFrame } from "@/components/workspace/cover-live-preview-frame";
 
 type Theme = "lecture" | "bootcamp";
 type ContentTheme = "lecture" | "bootcamp";
@@ -802,6 +806,56 @@ export function SlideWorkspace() {
   const editorRef = useRef<HTMLDivElement | null>(null);
   const measurementRef = useRef<HTMLDivElement | null>(null);
   const [paragraphMetrics, setParagraphMetrics] = useState<ParagraphMetric[]>([]);
+
+  // === 表紙(cover)専用 State ===
+  // 章番号 1 を表紙として扱う前提。設定はライブプレビューに即反映され、PNG出力もここから行う。
+  const [coverData, setCoverData] = useState<CoverData>({
+    catchBand: "プログラミング未経験から、7日でAIシステムが1本完成する。",
+    title: "AIエージェント ×\nClaude Code\n7日完全攻略",
+    subtitle: "未経験から7日で成果物1本",
+    personCharacterId: null,
+    pixelCharacterId: null,
+    colorPresetId: "claude-dark",
+    toolLogoId: "claude-code",
+  });
+  const [coverExporting, setCoverExporting] = useState(false);
+  const isCoverSection = activeSection === 1;
+  const coverSlide: Slide = useMemo(
+    () => ({
+      index: 1,
+      type: "cover",
+      title: coverData.title,
+      subtitle: coverData.subtitle,
+      catchBand: coverData.catchBand,
+      personCharacterId: coverData.personCharacterId,
+      pixelCharacterId: coverData.pixelCharacterId,
+      colorPresetId: coverData.colorPresetId,
+      toolLogoId: coverData.toolLogoId,
+      body: [],
+    }),
+    [coverData]
+  );
+  const coverPreviewHtml = useMemo(
+    () => renderSingleSlideHtml(coverSlide, "Cover Live Preview"),
+    [coverSlide]
+  );
+
+  // PNG出力: 現状は新タブで1920×1080レイアウトを開く(右クリックで保存 or 自動スクショ可能な状態)。
+  // TODO: 将来は /api/export-cover で Playwright を呼んで自動PNG生成に置き換える。
+  function handleExportCoverPng() {
+    setCoverExporting(true);
+    try {
+      const win = window.open("", "_blank", "width=1920,height=1080");
+      if (win) {
+        win.document.open();
+        win.document.write(coverPreviewHtml);
+        win.document.close();
+      }
+    } finally {
+      // open直後にfalseでOK(ウィンドウ表示は同期)。サーバー側化したら await の前後で挟む。
+      setCoverExporting(false);
+    }
+  }
 
   const activeSubThemeId = activeSubThemeIdByTheme[contentTheme];
   const currentSubTheme = useMemo(() => {
@@ -2790,6 +2844,15 @@ export function SlideWorkspace() {
         {/* === 4区: 選択中テンプレート / イラスト候補 / 生成後プレビュー === */}
         <article className="flex flex-col overflow-hidden bg-[#f8fafc]">
           <div className="grid gap-3.5 p-4 overflow-auto h-full content-start">
+            {isCoverSection ? (
+              <CoverConfigPanel
+                data={coverData}
+                onChange={setCoverData}
+                onExportPng={handleExportCoverPng}
+                isExporting={coverExporting}
+              />
+            ) : (
+              <>
             {/* 選択中スライド設定 */}
             <div
               className={`border border-slate-200 rounded-xl bg-white p-3.5 transition-opacity ${
@@ -3016,6 +3079,8 @@ export function SlideWorkspace() {
                 </div>
               )}
             </div>
+              </>
+            )}
 
             {/* 生成スライド */}
             <div className="border border-slate-200 rounded-xl bg-white p-3.5">
@@ -3094,10 +3159,14 @@ export function SlideWorkspace() {
                 </div>
               )}
               <div
+                id="cover-live-preview-frame"
                 className="mt-3 aspect-video overflow-hidden border border-slate-200 rounded-xl relative"
                 style={{ background: themeStyle.bg, color: themeStyle.text }}
               >
-                {displaySelectedSlide?.status === "failed" ? (
+                {isCoverSection ? (
+                  // === 表紙(1章目): ライブHTMLレンダリング ===
+                  <CoverLivePreviewFrame html={coverPreviewHtml} />
+                ) : displaySelectedSlide?.status === "failed" ? (
                   <div className="flex h-full flex-col justify-center p-[18px]">
                     <small className="text-[10px] font-black tracking-wider text-red-500">
                       SLIDE {displaySelectedSlide.num}

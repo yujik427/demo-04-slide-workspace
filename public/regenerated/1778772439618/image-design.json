@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T02テンプレートで経歴ステップ型レイアウト。左から右へ『プログラミング未経験』→『100個以上のシステム構築』→『初月売上4,500万円・4人体制達成』の3段階を視覚化。Claude Code配色（黒背景・オレンジアクセント）で実績の重みを表現。",
+      "text": {
+        "main": "未経験から初月4,500万円",
+        "sub": "100システム構築・4人体制で達成",
+        "other": [
+          "プログラミング経験ゼロからスタート",
+          "100個以上のシステムを構築",
+          "4人体制で初月売上4,500万円を達成"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "1. 結論 / 2枚目",
+    "template": "T02",
+    "illustration": "経歴ステップ",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T15:27:19.618Z"
+  }
+}

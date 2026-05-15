@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "stripe",
+  "style_description": "Claude Code aesthetic. STRICT COLOR PALETTE: background #0A0E27 (dark navy), main text #F5F5F7 (off-white), accent #FF6B35 (warm orange). Extra-bold sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Orange accent applied ONLY to hero numbers and CTA elements—keep accent area under 10% of total canvas. NO gradients, NO 3D, NO glossy effects. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "セミナー冒頭の結論スライド。T12テンプレートを用い、講演者の宣言と核心メッセージを提示。右側または下部に『チーム構成』イラストを配置し、Claude Code配色（オレンジ系アクセント＋ダーク基調）で信頼感と勢いを演出。タイトルは結論文型で断言、サブで条件を補強、本文で具体性を担保する。",
+      "text": {
+        "main": "7日でAIシステムが1本完成する",
+        "sub": "プログラミング未経験から到達可能",
+        "other": [
+          "本質のClaude Code完全攻略セミナー、1時間でお届けします",
+          "「無理でしょ」と思うのが普通、その感覚は正しい",
+          "しかし、私たちが今まさに実践していることです"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "1. 結論 / 1枚目",
+    "template": "T12",
+    "illustration": "チーム構成",
+    "colorTheme": "bootcamp",
+    "generatedAt": "2026-05-14T15:23:57.192Z"
+  }
+}

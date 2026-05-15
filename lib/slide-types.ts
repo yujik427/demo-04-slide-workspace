@@ -21,6 +21,18 @@ export type Slide = {
   body: string[];
   footer?: string | null;
   cta?: string | null;
+
+  // === 表紙(cover)専用フィールド ===
+  /** 黄色キャッチ帯の文言 */
+  catchBand?: string | null;
+  /** 人物キャラID(public/characters/person/{id}.png) */
+  personCharacterId?: string | null;
+  /** ピクセルキャラID(public/characters/pixel/{id}.png) */
+  pixelCharacterId?: string | null;
+  /** 配色プリセットID "claude-dark" | "claude-light" 等 */
+  colorPresetId?: string | null;
+  /** ツールロゴID "claude-code" 単独想定 */
+  toolLogoId?: string | null;
 };
 
 export type DeckMetadata = {

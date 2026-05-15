@@ -1,0 +1,27 @@
+{
+  "type": "single",
+  "style_base": "apple",
+  "style_description": "Lecture slide aesthetic. STRICT COLOR PALETTE: background #FFFFFF (white), main text #0F172A (deep navy), accent #0891B2 (cyan blue). Clean sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Cyan accent applied ONLY to hero numbers and key elements—keep accent area under 10% of total canvas. NO gradients, NO 3D. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "T01テンプレートで本セミナーの開幕スライドを構成。中央に大きくメインタイトルを配置し、サブタイトルで本日の所要時間と内容を示す。右側または下部に『チーム構成』イラストを配置し、講師と参加者の関係性を示唆。配色は講義スライド（落ち着いた知的トーン）を適用。",
+      "text": {
+        "main": "Claude Code完全攻略セミナー",
+        "sub": "本質を1時間で押さえる",
+        "other": [
+          "講師：アドネス株式会社 佐藤将司",
+          "本日のテーマ：Claude Code完全攻略",
+          "所要時間：1時間"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "1. 結論 / 1枚目",
+    "template": "T01",
+    "illustration": "チーム構成",
+    "colorTheme": "lecture",
+    "generatedAt": "2026-05-14T10:57:28.331Z"
+  }
+}

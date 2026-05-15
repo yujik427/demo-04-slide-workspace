@@ -1,0 +1,25 @@
+{
+  "type": "single",
+  "style_base": "apple",
+  "style_description": "Lecture slide aesthetic. STRICT COLOR PALETTE: background #FFFFFF (white), main text #0F172A (deep navy), accent #0891B2 (cyan blue). Clean sans-serif typography (Inter / Noto Sans JP). Generous whitespace 40%+, one focal point per slide. Cyan accent applied ONLY to hero numbers and key elements—keep accent area under 10% of total canvas. NO gradients, NO 3D. Flat design and line art only.",
+  "preset": "video-slide",
+  "images": [
+    {
+      "purpose": "章のオープニングスライド。T01テンプレートを使用し、中央に章タイトルを大きく配置。右側に『チーム構成』イラストを配置。講義スライド調の落ち着いた配色で、章の導入を明確に示す。",
+      "text": {
+        "main": "テスト原稿の確認",
+        "sub": "1章 / 1枚目",
+        "other": [
+          "これはテスト用の原稿です。"
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "sectionTitle": "1. テスト / 1枚目",
+    "template": "T01",
+    "illustration": "チーム構成",
+    "colorTheme": "lecture",
+    "generatedAt": "2026-05-14T13:06:07.317Z"
+  }
+}
