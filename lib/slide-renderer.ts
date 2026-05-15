@@ -20,45 +20,32 @@ function renderBody(lines: string[] = []) {
 }
 
 export function renderSlide(slide: Slide) {
-  const preset = slide.colorPresetId ?? "claude-dark";
-  const dataAttrs = `data-index="${slide.index}" data-type="${escapeHtml(slide.type)}" data-preset="${escapeHtml(preset)}"`;
+  const dataAttrs = `data-index="${slide.index}" data-type="${escapeHtml(slide.type)}"`;
 
   if (slide.type === "cover") {
-    const personSrc = slide.personCharacterId
-      ? `/characters/person/${slide.personCharacterId}.png`
-      : null;
-    const toolLogo = slide.toolLogoId ?? "claude-code";
-
     return `
 <section class="slide slide-cover" ${dataAttrs}>
-  <div class="cover-bg-pattern"></div>
-  <div class="cover-brand-row">
-    <span class="cover-brand-mark">◆</span>
-    <span class="cover-brand-name">アドネス</span>
+  <div class="brand-row">
+    <span class="brand-mark">SLIDE WORKSPACE</span>
+    <span class="brand-divider"></span>
+    <span class="brand-tag">${escapeHtml(slide.eyebrow ?? "")}</span>
   </div>
-
-  ${slide.catchBand ? `
-  <div class="cover-catch-wrap">
-    <div class="cover-catch-band">
-      <span class="cover-catch-text">${escapeHtml(slide.catchBand)}</span>
-    </div>
+  <div class="cover-main">
+    <h1 class="cover-title">${escapeHtmlWithBr(slide.title)}</h1>
+    ${slide.subtitle ? `<p class="cover-subtitle">${escapeHtml(slide.subtitle)}</p>` : ""}
+    ${
+      slide.highlight
+        ? `<div class="cover-highlight">${escapeHtml(slide.highlight)}${
+            slide.highlight_suffix
+              ? `<span class="cover-highlight-suffix">${escapeHtml(slide.highlight_suffix)}</span>`
+              : ""
+          }</div>`
+        : ""
+    }
   </div>
-  ` : ""}
-
-  <div class="cover-grid">
-    <div class="cover-text-zone">
-      <h1 class="cover-title">${escapeHtmlWithBr(slide.title)}</h1>
-      ${slide.subtitle ? `<p class="cover-subtitle">${escapeHtml(slide.subtitle)}</p>` : ""}
-    </div>
-    <div class="cover-character-zone">
-      ${personSrc ? `<img class="cover-person" src="${personSrc}" alt="" />` : `<div class="cover-person-placeholder">2.5D 男性キャラ<br/>(画像生成後に配置)</div>`}
-    </div>
-  </div>
-
-  <div class="cover-tool-row">
-    <span class="tool-chip tool-chip-primary">${escapeHtml(toolLogo === "claude-code" ? "Claude Code" : toolLogo)}</span>
-    <span class="tool-chip">Cursor</span>
-    <span class="tool-chip">GitHub</span>
+  <div class="cover-foot">
+    ${slide.body.length ? `<p class="cover-lead">${escapeHtml(slide.body[0])}</p>` : ""}
+    ${slide.footer ? `<p class="cover-org">${escapeHtml(slide.footer)}</p>` : ""}
   </div>
 </section>`;
   }
@@ -258,219 +245,79 @@ function renderDeckStyles() {
     align-self: end;
   }
 
-  /* ===== Cover (Slide 1) — スキルプラス フォーマット模倣 ===== */
   .slide-cover {
-    position: relative;
-    display: block;
-    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: radial-gradient(ellipse at top right, #1c2454 0%, #0a0e27 60%);
+    padding: 140px 160px;
     row-gap: 0;
-    background: var(--cover-bg);
-    color: var(--cover-text);
-    overflow: hidden;
   }
 
   .slide-cover::after { display: none; }
-  .slide-cover::before { display: none; }
 
-  /* 配色プリセット: 紫グラデ(濃いめ) */
-  .slide-cover[data-preset="claude-dark"] {
-    --cover-bg: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 35%, #8b5cf6 70%, #7c3aed 100%);
-    --cover-text: #0f0a2e;
-    --cover-subtitle-color: #1e1b4b;
-    --cover-catch-bg: #fde047;
-    --cover-catch-text: #0f0a2e;
-    --cover-pattern: rgba(255, 255, 255, 0.18);
-    --cover-pattern-strong: rgba(255, 255, 255, 0.32);
-    --cover-chip-bg: #ffffff;
-    --cover-chip-text: #1e1b4b;
-    --cover-character-bg: #f5f3ff;
+  .slide-cover::before {
+    width: 980px;
+    height: 980px;
+    top: -360px;
+    right: -360px;
+    background: radial-gradient(circle, rgba(255, 107, 53, 0.22), transparent 60%);
   }
 
-  .slide-cover[data-preset="claude-light"] {
-    --cover-bg: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fbbf24 100%);
-    --cover-text: #1e1b4b;
-    --cover-subtitle-color: #78350f;
-    --cover-catch-bg: #d97757;
-    --cover-catch-text: #ffffff;
-    --cover-pattern: rgba(217, 119, 87, 0.08);
-    --cover-chip-bg: #ffffff;
-    --cover-chip-text: #1e1b4b;
-    --cover-character-bg: #ffffff;
-  }
-
-  /* 背景パターン(製品UIを抽象化した格子+ドット) */
-  .cover-bg-pattern {
-    position: absolute;
-    inset: 0;
-    background-image:
-      radial-gradient(circle at 80% 30%, var(--cover-pattern) 2px, transparent 3px),
-      radial-gradient(circle at 20% 70%, var(--cover-pattern) 2px, transparent 3px),
-      linear-gradient(135deg, var(--cover-pattern) 1px, transparent 1px);
-    background-size: 60px 60px, 80px 80px, 200px 200px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* 左上ブランドマーク */
-  .cover-brand-row {
-    position: absolute;
-    top: 60px;
-    left: 80px;
-    z-index: 5;
+  .brand-row {
     display: flex;
     align-items: center;
-    gap: 16px;
-    background: rgba(255, 255, 255, 0.85);
-    padding: 14px 28px;
-    border-radius: 60px;
-    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.15);
+    gap: 28px;
+    color: var(--text-dim);
+    font-size: 22px;
+    letter-spacing: 0.22em;
+    font-weight: 700;
   }
 
-  .cover-brand-mark {
-    color: #7c3aed;
-    font-size: 36px;
-    line-height: 1;
-  }
+  .brand-mark { color: var(--accent); }
+  .brand-divider { width: 56px; height: 2px; background: var(--text-dim); }
 
-  .cover-brand-name {
-    color: #1e1b4b;
-    font-size: 28px;
-    font-weight: 900;
-    letter-spacing: 0.02em;
-  }
-
-  /* 黄色キャッチ帯(吹き出し型) */
-  .cover-catch-wrap {
-    position: absolute;
-    top: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 5;
-    max-width: 1280px;
-  }
-
-  .cover-catch-band {
-    background: var(--cover-catch-bg);
-    color: var(--cover-catch-text);
-    padding: 22px 80px;
-    font-weight: 900;
-    font-size: 42px;
-    letter-spacing: 0.01em;
-    line-height: 1.25;
-    text-align: center;
-    /* 両端を三角に切り取って吹き出し型 */
-    clip-path: polygon(40px 0, calc(100% - 40px) 0, 100% 50%, calc(100% - 40px) 100%, 40px 100%, 0 50%);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
-  }
-
-  .cover-catch-text {
-    display: inline-block;
-  }
-
-  /* メイン領域: 左テキスト/右キャラ */
-  .cover-grid {
-    position: relative;
-    z-index: 2;
-    display: grid;
-    grid-template-columns: 1.2fr 0.9fr;
-    gap: 60px;
-    padding: 220px 100px 200px;
-    align-items: center;
-    min-height: 100%;
-  }
-
-  .cover-text-zone {
+  .cover-main {
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: 56px;
+    max-width: 1600px;
   }
 
   .cover-title {
-    font-size: 124px;
-    line-height: 1.05;
+    font-size: 120px;
+    line-height: 1.12;
     font-weight: 900;
-    letter-spacing: -0.025em;
-    color: var(--cover-text);
+    letter-spacing: -0.02em;
     margin: 0;
-    text-shadow: 0 4px 16px rgba(255, 255, 255, 0.4);
   }
 
   .cover-subtitle {
-    font-size: 40px;
-    line-height: 1.4;
-    color: var(--cover-subtitle-color);
-    font-weight: 800;
+    font-size: 32px;
+    color: var(--text-dim);
     margin: 0;
-    background: rgba(255, 255, 255, 0.7);
-    padding: 14px 32px;
-    border-radius: 12px;
-    display: inline-block;
-    width: fit-content;
+    font-weight: 500;
+    line-height: 1.5;
   }
 
-  .cover-character-zone {
-    position: relative;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    height: 100%;
-  }
-
-  .cover-person {
-    width: 100%;
-    max-height: 760px;
-    object-fit: contain;
-    filter: drop-shadow(0 24px 48px rgba(76, 29, 149, 0.3));
-  }
-
-  .cover-person-placeholder {
-    width: 420px;
-    height: 620px;
-    background: var(--cover-character-bg);
-    border: 3px dashed rgba(124, 58, 237, 0.45);
-    border-radius: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #7c3aed;
-    font-size: 26px;
-    font-weight: 800;
-    text-align: center;
-    line-height: 1.6;
-    padding: 24px;
-    box-shadow: 0 24px 48px rgba(76, 29, 149, 0.25);
-  }
-
-  /* 下部ツールロゴ(チップ並び) */
-  .cover-tool-row {
-    position: absolute;
-    bottom: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 5;
-    display: flex;
-    align-items: center;
+  .cover-highlight {
+    display: inline-flex;
+    align-items: baseline;
     gap: 20px;
-    background: rgba(255, 255, 255, 0.92);
-    padding: 18px 32px;
-    border-radius: 100px;
-    box-shadow: 0 12px 32px rgba(76, 29, 149, 0.2);
-  }
-
-  .tool-chip {
-    color: var(--cover-chip-text);
-    font-size: 30px;
+    color: var(--accent);
     font-weight: 900;
-    letter-spacing: -0.01em;
-    padding: 8px 24px;
-    border-radius: 60px;
-    background: transparent;
+    font-size: 64px;
   }
 
-  .tool-chip-primary {
-    background: linear-gradient(135deg, #d97757 0%, #f97316 100%);
-    color: #ffffff;
+  .cover-highlight-suffix {
+    color: var(--text);
+    font-size: 32px;
+    font-weight: 700;
   }
+
+  .cover-foot { display: flex; flex-direction: column; gap: 16px; }
+  .cover-lead { font-size: 28px; color: var(--text); margin: 0; max-width: 1500px; line-height: 1.6; }
+  .cover-org { font-size: 22px; color: var(--text-dim); margin: 0; letter-spacing: 0.04em; }
 
   .slide-cta {
     display: flex;
