@@ -1457,6 +1457,64 @@ export function SlideWorkspace() {
     setRenamingSubThemeId(subThemeId);
   }
 
+  // 小テーマを複製する。章タイトル + 原稿テキストのみコピーし、
+  // 採用状態・生成スライド・履歴は引き継がない（新規 paragraphId として扱われる）。
+  function duplicateSubTheme(theme: ContentTheme, subThemeId: string) {
+    const nav = workspaceV2StateRef.current.navigation;
+    const sub = nav.themes[theme].subThemes.find((s) => s.id === subThemeId);
+    if (!sub) return;
+
+    const newSubId = `sub-${Date.now()}`;
+    const chapterIdMap = new Map<number, number>();
+    let nextChapterId = computeNextChapterId(nav);
+    const newChapters: ChapterEntry[] = sub.chapters.map((ch) => {
+      const newId = nextChapterId;
+      nextChapterId += 1;
+      chapterIdMap.set(ch.id, newId);
+      return { id: newId, title: ch.title };
+    });
+
+    const newSub: SubThemeEntry = {
+      id: newSubId,
+      name: `${sub.name} のコピー`,
+      chapters: newChapters,
+    };
+
+    updateNavigation((current) => ({
+      ...current,
+      themes: {
+        ...current.themes,
+        [theme]: {
+          subThemes: [...current.themes[theme].subThemes, newSub],
+        },
+      },
+    }));
+
+    // 原稿テキストをコピー（editedScripts の自動保存 useEffect が拾って script-draft.json に書き込む）
+    setEditedScripts((prev) => {
+      const next = { ...prev };
+      chapterIdMap.forEach((newId, oldId) => {
+        const text = prev[oldId] ?? CHAPTER_DEFAULTS[oldId];
+        if (text !== undefined && text !== null) {
+          next[newId] = text;
+        }
+      });
+      return next;
+    });
+    chapterIdMap.forEach((newId, oldId) => {
+      const text = draftScriptsRef.current[oldId];
+      if (text !== undefined) {
+        draftScriptsRef.current[newId] = text;
+      }
+    });
+
+    // アクティブを複製先に切り替え
+    setContentTheme(theme);
+    setActiveSubThemeIdByTheme((prev) => ({ ...prev, [theme]: newSubId }));
+    if (newChapters[0]) setActiveSection(newChapters[0].id);
+    setRenamingSubThemeId(newSubId);
+  }
+
   function renameSubTheme(theme: ContentTheme, subThemeId: string, newName: string) {
     const trimmed = newName.trim();
     setRenamingSubThemeId(null);
@@ -2419,6 +2477,24 @@ export function SlideWorkspace() {
                                   title="名前を編集"
                                 >
                                   ✎
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => duplicateSubTheme(themeKey, sub.id)}
+                                  aria-label="この小テーマを複製"
+                                  className="inline-flex items-center justify-center w-6 h-6 rounded text-slate-400 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity hover:text-[#0f5f7a] hover:bg-white"
+                                  title="複製（章タイトル＋原稿をコピー）"
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    className="h-3.5 w-3.5"
+                                    aria-hidden="true"
+                                  >
+                                    <path d="M7 3a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V7.414a2 2 0 0 0-.586-1.414l-2.414-2.414A2 2 0 0 0 10.586 3H7Z" />
+                                    <path d="M3 7a2 2 0 0 1 2-2v9a3 3 0 0 0 3 3h6a2 2 0 0 1-2 2H7a4 4 0 0 1-4-4V7Z" />
+                                  </svg>
                                 </button>
                                 <button
                                   type="button"
