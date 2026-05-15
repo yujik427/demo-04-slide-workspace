@@ -490,9 +490,9 @@ function reconcileParagraphSettings(
     if (fallbackIndex >= 0) {
       usedIndexes.add(fallbackIndex);
       const previous = previousSettings[fallbackIndex];
-      // テキスト一致(exactIndex)時のみ採用状態を引き継ぐ。同位置 fallback では原稿が
-      // 変わっているため、採用済みは外す。
-      const isExactMatch = exactIndex >= 0;
+      // 同位置の段落であれば、テキストフィンガープリントの微小差分（改行・空白・正規化
+      // 揺れ）で採用状態が消える事故を防ぐため、approvedImagePath は常に引き継ぐ。
+      // 原稿を大幅に変更した場合は、ユーザーが手動で再生成すれば画像も更新される。
       return {
         ...previous,
         textFingerprint,
@@ -502,7 +502,7 @@ function reconcileParagraphSettings(
           previous.illustrationSource === "manual"
             ? previous.illustrationId
             : recommended.illustrationId,
-        approvedImagePath: isExactMatch ? previous.approvedImagePath ?? null : null,
+        approvedImagePath: previous.approvedImagePath ?? null,
       };
     }
 
