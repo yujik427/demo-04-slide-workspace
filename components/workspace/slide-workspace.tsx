@@ -783,6 +783,9 @@ export function SlideWorkspace() {
     confirmLabel?: string;
   } | null>(null);
   const [launchingPipeline, setLaunchingPipeline] = useState(false);
+  const [pathSetupOpen, setPathSetupOpen] = useState(false);
+  const [pathInput, setPathInput] = useState("");
+  const [pathCopiedKey, setPathCopiedKey] = useState<string | null>(null);
   const [renamingChapterId, setRenamingChapterId] = useState<number | null>(null);
   const [renamingSubThemeId, setRenamingSubThemeId] = useState<string | null>(null);
   // 章ごとに編集中の原稿テキストを保持（state、リロードで消える）
@@ -1527,43 +1530,61 @@ export function SlideWorkspace() {
 
   // claude-cli:// deep link を発火してローカルの Claude Code を起動する。
   // 公式仕様: https://code.claude.com/docs/en/deep-links （Claude Code v2.1.91 以降）
-  // cwd は各ユーザーのローカルパスなので localStorage に保存する。
+  const LOCAL_CWD_STORAGE_KEY = "demo-04-slide-workspace:local-cwd";
+
+  function fireLaunchDeepLink(cwd: string) {
+    const prompt = "スライド原稿作成開始";
+    const url = `claude-cli://open?cwd=${encodeURIComponent(cwd)}&q=${encodeURIComponent(prompt)}`;
+    window.location.href = url;
+    setConfirmState({
+      title: "Claude Code を起動しました",
+      message:
+        "ローカルの Claude Code が立ち上がり、プロンプト「スライド原稿作成開始」がプリフィルされます。Enter で送信すると grill-me による原稿要件の対話が始まります。\n\n反映を確認するには、対話・パイプライン完了後にこの画面をリロードしてください。",
+      confirmLabel: "OK",
+      onConfirm: () => setConfirmState(null),
+    });
+  }
+
   function handleLaunchPipeline() {
     if (launchingPipeline) return;
+    const saved = localStorage.getItem(LOCAL_CWD_STORAGE_KEY);
+    if (!saved) {
+      setPathInput("");
+      setPathSetupOpen(true);
+      return;
+    }
     setLaunchingPipeline(true);
     try {
-      const STORAGE_KEY = "demo-04-slide-workspace:local-cwd";
-      let cwd = localStorage.getItem(STORAGE_KEY);
-      if (!cwd) {
-        const input = window.prompt(
-          [
-            "ローカルの demo-04-slide-workspace の絶対パスを入力してください。",
-            "（一度入力すると次回以降は自動で使われます）",
-            "",
-            "例: /Users/yujikubo/Desktop/Reviatro-HQ/projects/portfolio-demo/demo-04-slide-workspace",
-          ].join("\n"),
-          ""
-        );
-        if (!input || !input.trim()) return;
-        cwd = input.trim();
-        localStorage.setItem(STORAGE_KEY, cwd);
-      }
-
-      const prompt = "スライド原稿作成開始";
-      const url = `claude-cli://open?cwd=${encodeURIComponent(cwd)}&q=${encodeURIComponent(prompt)}`;
-      window.location.href = url;
-
-      setConfirmState({
-        title: "Claude Code を起動しました",
-        message:
-          "ローカルの Claude Code が立ち上がり、プロンプト「スライド原稿作成開始」がプリフィルされます。Enter で送信すると grill-me による原稿要件の対話が始まります。\n\n反映を確認するには、対話・パイプライン完了後にこの画面をリロードしてください。",
-        confirmLabel: "OK",
-        onConfirm: () => setConfirmState(null),
-      });
+      fireLaunchDeepLink(saved);
     } catch (e) {
       window.alert(`起動失敗: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
       setLaunchingPipeline(false);
+    }
+  }
+
+  function handleSavePath() {
+    const cwd = pathInput.trim();
+    if (!cwd) return;
+    localStorage.setItem(LOCAL_CWD_STORAGE_KEY, cwd);
+    setPathSetupOpen(false);
+    setLaunchingPipeline(true);
+    try {
+      fireLaunchDeepLink(cwd);
+    } catch (e) {
+      window.alert(`起動失敗: ${e instanceof Error ? e.message : String(e)}`);
+    } finally {
+      setLaunchingPipeline(false);
+    }
+  }
+
+  async function copyPathHint(text: string, key: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setPathCopiedKey(key);
+      window.setTimeout(() => setPathCopiedKey((prev) => (prev === key ? null : prev)), 1500);
+    } catch {
+      window.prompt("以下をコピーしてください:", text);
     }
   }
 
@@ -3269,6 +3290,112 @@ export function SlideWorkspace() {
                   OK
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* === ローカルパス設定モーダル (初回のみ) === */}
+      {pathSetupOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+          onClick={() => setPathSetupOpen(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="bg-white rounded-2xl max-w-[560px] w-full p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-[16px] font-black text-slate-800 mb-1">
+              ローカル環境のパスを設定してください
+            </h2>
+            <p className="text-[12px] leading-[1.7] text-slate-600 mb-4">
+              「AIで原稿を作る」を使うには、あなたのPC内の <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-[11px]">demo-04-slide-workspace</code> フォルダの絶対パスが必要です。<span className="font-bold">一度設定すれば次回からは自動です。</span>
+            </p>
+
+            <div className="rounded-lg bg-slate-50 border border-slate-200 p-4 mb-4">
+              <p className="text-[12px] font-black text-slate-700 mb-2">パスの調べ方</p>
+
+              <div className="grid gap-3">
+                <div>
+                  <p className="text-[11px] font-bold text-slate-600 mb-1.5">macOS の場合</p>
+                  <ol className="text-[11px] leading-[1.7] text-slate-600 list-decimal list-inside space-y-1.5">
+                    <li>「ターミナル.app」または「iTerm」を開く（Finder → アプリケーション → ユーティリティ）</li>
+                    <li>
+                      <span>下記コマンドで clone した場所に移動 </span>
+                      <span className="inline-flex items-center gap-1 ml-1">
+                        <code className="bg-white px-1.5 py-0.5 rounded border border-slate-200 font-mono text-[11px]">cd ~/Desktop/demo-04-slide-workspace</code>
+                        <button
+                          type="button"
+                          onClick={() => copyPathHint("cd ~/Desktop/demo-04-slide-workspace", "mac-cd")}
+                          className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-slate-200 bg-white text-slate-500 hover:text-[#0f5f7a]"
+                        >
+                          {pathCopiedKey === "mac-cd" ? "✓ コピー済み" : "コピー"}
+                        </button>
+                      </span>
+                      <span className="text-[10px] text-slate-400 ml-1">（場所が違う人は適宜変更）</span>
+                    </li>
+                    <li>
+                      <span>絶対パスを表示 </span>
+                      <span className="inline-flex items-center gap-1 ml-1">
+                        <code className="bg-white px-1.5 py-0.5 rounded border border-slate-200 font-mono text-[11px]">pwd</code>
+                        <button
+                          type="button"
+                          onClick={() => copyPathHint("pwd", "mac-pwd")}
+                          className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-slate-200 bg-white text-slate-500 hover:text-[#0f5f7a]"
+                        >
+                          {pathCopiedKey === "mac-pwd" ? "✓ コピー済み" : "コピー"}
+                        </button>
+                      </span>
+                    </li>
+                    <li>表示された結果（<code className="bg-white px-1 py-0.5 rounded font-mono text-[10px]">/Users/...</code> で始まる行）をコピー</li>
+                    <li>下の入力欄に貼り付け</li>
+                  </ol>
+                </div>
+
+                <div>
+                  <p className="text-[11px] font-bold text-slate-600 mb-1.5">Windows の場合</p>
+                  <ol className="text-[11px] leading-[1.7] text-slate-600 list-decimal list-inside space-y-1.5">
+                    <li>エクスプローラーで <code className="bg-white px-1 py-0.5 rounded font-mono text-[10px]">demo-04-slide-workspace</code> フォルダを開く</li>
+                    <li>アドレスバーをクリック → 表示されたパスをコピー（例: <code className="bg-white px-1 py-0.5 rounded font-mono text-[10px]">C:\Users\...\demo-04-slide-workspace</code>）</li>
+                    <li>下の入力欄に貼り付け</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+
+            <label className="block text-[11px] font-bold text-slate-700 mb-1.5">
+              絶対パス
+            </label>
+            <input
+              type="text"
+              value={pathInput}
+              onChange={(e) => setPathInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && pathInput.trim()) handleSavePath();
+              }}
+              placeholder="/Users/yourname/Desktop/demo-04-slide-workspace"
+              autoFocus
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[12px] font-mono mb-4 focus:outline-none focus:border-[#0f5f7a]"
+            />
+
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setPathSetupOpen(false)}
+                className="px-4 py-2 border border-slate-200 rounded-lg bg-white text-slate-600 text-[12px] font-extrabold hover:bg-slate-50"
+              >
+                キャンセル
+              </button>
+              <button
+                type="button"
+                onClick={handleSavePath}
+                disabled={!pathInput.trim()}
+                className="px-4 py-2 rounded-lg bg-[#0f5f7a] text-white text-[12px] font-extrabold hover:bg-[#0d4f66] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                保存して起動
+              </button>
             </div>
           </div>
         </div>
